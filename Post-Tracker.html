@@ -780,7 +780,7 @@
     <!-- Auto-post button -->
     <button id="autoPostBtn" onclick="startAutoPost()"
       style="width:100%;background:var(--text);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:14px 20px;border-radius:var(--r-sm);cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;">
-      🚀 Start Auto-Post to All Groups
+      🚀 Auto-Post Selected Group Only
     </button>
 
     <!-- Stop button (hidden by default) -->
@@ -1309,15 +1309,19 @@ async function startAutoPost() {
   const caption = document.getElementById('postText').value.trim();
   if (!caption) { showToast('Add a caption first'); return; }
 
-  const pendingGroups = groups.filter(g => g.status === 'pending' && g.link);
-  if (pendingGroups.length === 0) { showToast('No pending groups with links'); return; }
+  const selectedGroups = groups.filter(g => selectedIds.has(g.id) && g.status === 'pending' && g.link);
+  if (selectedGroups.length !== 1) {
+    showToast('Select exactly 1 pending group first');
+    alert('Safety lock: choose exactly 1 group before auto-posting.\n\nTap "☑ Select", tap one group, then press Auto-Post again.');
+    return;
+  }
 
-  if (!confirm(`Auto-post to ${pendingGroups.length} groups?\n\nMake sure your PC script (poster.js) is ready to run!`)) return;
+  if (!confirm(`Auto-post to ONLY this group?\n\n${selectedGroups[0].name}\n\nThis will not post to other groups.`)) return;
 
   // Build form data
   const formData = new FormData();
   formData.append('caption', caption);
-  formData.append('groups', JSON.stringify(pendingGroups));
+  formData.append('groups', JSON.stringify(selectedGroups));
   selectedImages.forEach(img => formData.append('images', img));
 
   const btn = document.getElementById('autoPostBtn');
@@ -1336,11 +1340,11 @@ async function startAutoPost() {
     // Show stop button + progress
     document.getElementById('autoStopBtn').style.display = 'block';
     document.getElementById('autoProgress').style.display = 'block';
-    startProgressPolling(url, pendingGroups.length);
+    startProgressPolling(url, selectedGroups.length);
 
   } catch (err) {
     showToast('❌ Failed: ' + err.message);
-    btn.textContent = '🚀 Start Auto-Post to All Groups';
+    btn.textContent = '🚀 Auto-Post Selected Group Only';
     btn.style.opacity = '1';
     btn.disabled = false;
   }
@@ -1351,7 +1355,7 @@ async function stopAutoPost() {
   try { await fetch(`${url}/stop`, { method: 'POST' }); } catch {}
   clearInterval(autoPostInterval);
   document.getElementById('autoStopBtn').style.display = 'none';
-  document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post to All Groups';
+  document.getElementById('autoPostBtn').textContent = '🚀 Auto-Post Selected Group Only';
   document.getElementById('autoPostBtn').disabled = false;
   document.getElementById('autoPostBtn').style.opacity = '1';
   showToast('Auto-post stopped');
