@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
 <title>Post-Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=Sarabun:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
     --bg: #f5f4f0;
@@ -28,884 +28,346 @@
     --waiting-card: #fffcf7;
     --waiting-dot: #e09040;
 
-    --pending-dot: #d8d5d0;
-
-    /* Session highlight */
-    --session-glow: #1a1916;
-    --session-card: #fffff8;
-    --session-border: #1a1916;
-
+    --pending-dot: #d8d4cd;
     --r: 16px;
-    --r-sm: 10px;
-    --r-full: 100px;
+    --r-sm: 8px;
+    --r-full: 99px;
   }
 
   * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-
   body {
+    font-family: 'DM Sans', 'Sarabun', sans-serif;
     background: var(--bg);
     color: var(--text);
-    font-family: 'DM Sans', 'Sarabun', sans-serif;
-    min-height: 100vh;
-    padding-bottom: 140px;
-    font-weight: 400;
+    padding-bottom: 120px;
+    line-height: 1.4;
   }
 
-  /* ─── HEADER ─── */
   .header {
     background: var(--bg);
-    padding: 32px 20px 20px;
+    padding: 20px 16px 12px;
     position: sticky;
     top: 0;
     z-index: 100;
   }
-
-  .header-top {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 20px;
-  }
-
-  .brand { display: flex; flex-direction: column; gap: 2px; }
-  .brand-sub { font-size: 11px; font-weight: 500; color: var(--text-dim); letter-spacing: 0.5px; }
-  .brand-title { font-size: 26px; font-weight: 400; color: var(--text); line-height: 1.1; }
-
+  .brand-sub { font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; }
+  .brand-row { display: flex; justify-content: space-between; align-items: flex-end; }
+  .brand-title { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; color: var(--text); line-height: 1; }
+  
+  .top-actions { display: flex; gap: 6px; }
   .reset-btn {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    color: var(--text-mid);
-    padding: 8px 16px;
-    border-radius: var(--r-full);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
+    background: transparent; border: 1px solid var(--border); color: var(--text-mid);
+    padding: 6px 12px; border-radius: var(--r-full); font-size: 11px; font-weight: 500; cursor: pointer;
   }
-  .reset-btn:active { background: var(--border); }
+  .reset-btn:active { background: rgba(0,0,0,0.03); }
 
-  .progress-meta {
-    display: flex;
-    justify-content: space-between;
-    align-items: baseline;
-    margin-bottom: 10px;
-  }
-  .progress-meta .label { font-size: 12px; font-weight: 500; color: var(--text-dim); }
-  .progress-meta .count { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); }
-
-  .progress-track {
-    background: var(--border);
-    height: 6px;
-    width: 100%;
-    border-radius: var(--r-full);
-    overflow: hidden;
-  }
-  .progress-fill {
-    height: 6px;
-    background: var(--text);
-    border-radius: var(--r-full);
-    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
-  }
-
-  /* ─── SESSION BANNER ─── */
-  .session-banner {
-    background: var(--text);
-    color: #fff;
-    padding: 10px 20px;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    font-size: 12px;
-    font-weight: 500;
-    letter-spacing: 0.3px;
-    display: none;
-  }
-  .session-banner.active { display: flex; }
-  .session-banner .session-info { display: flex; align-items: center; gap: 8px; }
-  .session-pulse {
-    width: 8px; height: 8px; border-radius: 50%;
-    background: #fff;
-    animation: pulse 1.5s ease-in-out infinite;
-  }
-  @keyframes pulse {
-    0%, 100% { opacity: 1; transform: scale(1); }
-    50% { opacity: 0.4; transform: scale(0.8); }
-  }
-  .session-stop-btn {
-    background: rgba(255,255,255,0.2);
-    border: 1px solid rgba(255,255,255,0.4);
-    color: #fff;
-    padding: 5px 12px;
-    border-radius: var(--r-full);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    cursor: pointer;
-  }
-
-  /* ─── CONTENT ─── */
-  .content { padding: 16px; max-width: 480px; margin: 0 auto; }
-
-  .post-card {
+  .main-card {
     background: var(--surface);
     border-radius: var(--r);
-    padding: 20px;
-    margin-bottom: 16px;
-    border: 1.5px solid var(--border);
+    padding: 16px;
+    margin: 0 16px 16px;
+    border: 1px solid var(--border-soft);
   }
 
-  .card-label-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 12px;
+  .card-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-mid); }
+  .input-group { display: flex; gap: 8px; margin-bottom: 12px; }
+  .input-flat {
+    flex: 1; background: var(--bg); border: 1px solid transparent;
+    padding: 10px 14px; border-radius: var(--r-sm); font-family: inherit; font-size: 14px; color: var(--text);
+    outline: none; transition: all 0.2s;
+  }
+  .input-flat:focus { border-color: var(--text-dim); background: var(--surface); }
+  
+  .btn-action {
+    background: var(--text); color: var(--surface); border: none;
+    padding: 0 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; cursor: pointer;
+  }
+  .btn-action:active { opacity: 0.8; }
+
+  .status-indicator { font-size: 12px; font-weight: 500; color: var(--text-mid); display: flex; align-items: center; gap: 4px; }
+
+  .composer-box { display: flex; flex-direction: column; gap: 10px; }
+  .textarea-flat {
+    width: 100%; height: 100px; background: var(--bg); border: 1px solid transparent;
+    padding: 12px; border-radius: var(--r-sm); font-family: inherit; font-size: 14px; color: var(--text);
+    resize: none; outline: none; transition: all 0.2s;
+  }
+  .textarea-flat:focus { border-color: var(--text-dim); background: var(--surface); }
+
+  .composer-actions { display: flex; justify-content: space-between; align-items: center; }
+  .media-btn-wrap { position: relative; display: inline-block; }
+  .file-input-hidden { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
+  .btn-secondary {
+    background: transparent; border: 1px solid var(--border); color: var(--text-mid);
+    padding: 8px 14px; border-radius: var(--r-full); font-size: 13px; font-weight: 500; cursor: pointer;
+    display: flex; align-items: center; gap: 6px;
+  }
+  .btn-secondary:active { background: rgba(0,0,0,0.02); }
+
+  .btn-primary {
+    background: #1a1a1a; color: #fff; border: none;
+    padding: 8px 16px; border-radius: var(--r-full); font-size: 13px; font-weight: 500; cursor: pointer;
+  }
+  .btn-primary:disabled { background: var(--text-dim); cursor: not-allowed; }
+
+  .tpl-deck { display: flex; gap: 8px; overflow-x: auto; padding: 4px 16px 12px; scrollbar-width: none; }
+  .tpl-deck::-webkit-scrollbar { display: none; }
+  .tpl-card {
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--r-sm);
+    padding: 12px; min-width: 150px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
+  }
+  .tpl-label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; }
+  .tpl-input {
+    width: 100%; background: var(--bg); border: none; padding: 6px 8px; border-radius: 4px;
+    font-size: 12px; font-family: inherit; color: var(--text); outline: none;
+  }
+  .tpl-btn-row { display: flex; gap: 4px; }
+  .tpl-mini-btn {
+    flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-mid);
+    padding: 4px 0; border-radius: 4px; font-size: 10px; font-weight: 500; cursor: pointer; text-align: center;
   }
 
-  .card-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-dim);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
+  .sticky-filter-bar {
+    position: sticky; top: 68px; z-index: 90; background: var(--bg);
+    padding: 4px 16px 12px; display: flex; justify-content: space-between; align-items: center;
   }
-
-  .clear-section-btn {
-    background: transparent;
-    border: none;
-    color: #c05050;
-    font-size: 11px;
-    font-weight: 600;
-    cursor: pointer;
-    text-transform: uppercase;
-    letter-spacing: 0.3px;
-  }
-  .clear-section-btn:active { opacity: 0.6; }
-
-  .post-textarea {
-    width: 100%;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    color: var(--text);
-    font-family: 'Sarabun', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 1.7;
-    padding: 12px 14px;
-    resize: none;
-    min-height: 90px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .post-textarea:focus { border-color: var(--text); }
-  .post-textarea::placeholder { color: var(--text-dim); }
-
-  .copy-btn {
-    margin-top: 12px;
-    background: var(--text);
-    border: none;
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 13px 20px;
-    width: 100%;
-    cursor: pointer;
-    transition: all 0.2s;
-    border-radius: var(--r-sm);
-  }
-  .copy-btn:active { opacity: 0.8; transform: scale(0.99); }
-  .copy-btn.copied { background: #3a7d52; }
-
-  .section-divider {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    margin: 4px 0 14px;
-  }
-  .section-divider .line { flex: 1; height: 1px; background: var(--border); }
-  .section-divider .label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-dim);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-  }
-
-  /* ─── TOOLBAR ROW ─── */
-  .toolbar-row {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 10px;
-    align-items: center;
-  }
-
-  /* Session button */
-  .session-btn {
-    padding: 9px 14px;
-    background: var(--text);
-    border: none;
-    color: #fff;
-    border-radius: var(--r-full);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-    display: flex;
-    align-items: center;
-    gap: 5px;
-  }
-  .session-btn:active { opacity: 0.8; transform: scale(0.97); }
-  .session-btn.session-active {
-    background: #3a7d52;
-  }
-
-  /* Multi-select button */
-  .multiselect-btn {
-    padding: 9px 14px;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    color: var(--text-mid);
-    border-radius: var(--r-full);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    white-space: nowrap;
-  }
-  .multiselect-btn:active { transform: scale(0.97); }
-  .multiselect-btn.ms-active {
-    background: var(--text);
-    border-color: var(--text);
-    color: #fff;
-    font-weight: 600;
-  }
-
-  /* ─── BULK ACTION BAR ─── */
-  .bulk-bar {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r);
-    padding: 12px 14px;
-    margin-bottom: 10px;
-    display: none;
-    gap: 8px;
-    align-items: center;
-    flex-wrap: wrap;
-  }
-  .bulk-bar.visible { display: flex; }
-
-  .bulk-count {
-    font-size: 12px;
-    font-weight: 600;
-    color: var(--text-mid);
-    flex: 1;
-  }
-
-  .bulk-action-btn {
-    padding: 8px 14px;
-    border-radius: var(--r-full);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 600;
-    cursor: pointer;
-    border: 1.5px solid transparent;
-    transition: all 0.2s;
-  }
-  .bulk-action-btn:active { opacity: 0.7; }
-
-  .bulk-btn-done {
-    background: var(--approved-bg);
-    color: #fff;
-    border-color: var(--approved-bg);
-  }
-  .bulk-btn-wait {
-    background: var(--waiting-bg);
-    color: var(--waiting-text);
-    border-color: var(--waiting-border);
-  }
-  .bulk-btn-reset {
-    background: var(--bg);
-    color: var(--text-mid);
-    border-color: var(--border);
-  }
-  .bulk-select-all-btn {
-    background: transparent;
-    color: var(--text-mid);
-    border-color: var(--border);
-    font-weight: 500;
-  }
-
-  /* ─── FILTER TABS ─── */
-  .filter-tabs {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 14px;
-    flex: 1;
-  }
-
+  .filter-tabs { display: flex; background: rgba(0,0,0,0.04); padding: 2px; border-radius: var(--r-full); }
   .filter-tab {
-    flex: 1;
-    padding: 10px 8px;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-full);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    color: var(--text-mid);
-    cursor: pointer;
-    transition: all 0.2s;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 5px;
+    background: transparent; border: none; color: var(--text-mid);
+    padding: 6px 14px; border-radius: var(--r-full); font-size: 12px; font-weight: 500; cursor: pointer;
   }
-  .filter-tab:active { transform: scale(0.97); }
+  .filter-tab.active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
 
-  .filter-tab.tab-all.active { background: var(--text); border-color: var(--text); color: #fff; }
-  .filter-tab.tab-approved.active { background: var(--text); border-color: var(--text); color: #fff; }
-  .filter-tab.tab-waiting.active { background: var(--waiting-bg); border-color: var(--waiting-border); color: var(--waiting-text); }
+  .ms-btn {
+    background: transparent; border: 1px solid var(--border); color: var(--text-mid);
+    padding: 5px 12px; border-radius: var(--r-full); font-size: 11px; font-weight: 500; cursor: pointer;
+  }
+  .ms-btn.ms-active { background: var(--text); color: var(--surface); border-color: var(--text); }
 
-  .tab-count { font-size: 12px; font-weight: 600; opacity: 0.7; }
+  .progress-section { padding: 0 16px 12px; }
+  .progress-meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--text-mid); margin-bottom: 6px; }
+  .track-bg { width: 100%; height: 4px; background: rgba(0,0,0,0.05); border-radius: var(--r-full); overflow: hidden; }
+  .track-fill { height: 100%; width: 0%; background: var(--text); transition: width 0.3s ease; }
 
-  /* ─── GROUP ITEM ─── */
+  .list-container { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
+  
   .group-item {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r);
-    margin-bottom: 10px;
-    overflow: hidden;
-    transition: border-color 0.2s, background 0.2s, box-shadow 0.3s;
-    user-select: none;
+    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--r);
+    overflow: hidden; transition: all 0.2s;
+  }
+  
+  .group-main { padding: 14px 14px; display: flex; align-items: center; gap: 10px; position: relative; cursor: pointer; }
+  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pending-dot); flex-shrink: 0; }
+  .group-info { flex: 1; min-width: 0; }
+  .group-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .group-note { font-size: 11px; color: #b86060; margin-top: 1px; font-weight: 400; }
+  .group-badge {
+    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--r-full);
+    background: rgba(0,0,0,0.04); color: var(--text-mid);
   }
 
-  .group-item.status-done { background: var(--approved-card); border-color: var(--border); }
-  .group-item.status-waiting { background: var(--waiting-card); border-color: var(--waiting-border); }
-
-  /* Session highlight — next pending group */
-  .group-item.session-next {
-    border-color: var(--session-border);
-    border-width: 2px;
-    box-shadow: 0 0 0 3px rgba(26,25,22,0.08);
-    background: var(--session-card);
+  .group-actions {
+    display: flex; gap: 1px; background: var(--border-soft); border-top: 1px solid var(--border-soft);
   }
-
-  /* Multi-select selected */
-  .group-item.ms-selected {
-    border-color: var(--text);
-    border-width: 2px;
-    background: #f0ede8;
+  .group-action-btn {
+    flex: 1; background: var(--surface); border: none; padding: 10px 0;
+    font-size: 11px; font-weight: 500; color: var(--text-mid); cursor: pointer;
   }
+  .group-action-btn:active { background: var(--bg); }
+  .btn-post-mark { color: #2e66d4; font-weight: 600; background: #fafdff; }
 
-  .group-main {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    padding: 14px 16px;
-    cursor: pointer;
-  }
+  .status-done .status-dot { background: var(--text); }
+  .status-done .group-item { background: var(--approved-card); }
+  .status-done .group-badge { background: var(--approved-bg); color: var(--approved-text); }
+  .status-done .btn-post { background: #f5f5f5; color: var(--text); font-weight: 600; }
 
-  /* Checkbox (multi-select mode) */
+  .status-waiting .status-dot { background: var(--waiting-dot); }
+  .status-waiting .group-badge { background: var(--waiting-bg); color: var(--waiting-text); }
+  .status-waiting .btn-wait { background: var(--waiting-bg); color: var(--waiting-text); font-weight: 600; }
+
   .ms-checkbox {
-    width: 20px;
-    height: 20px;
-    border-radius: 6px;
-    border: 2px solid var(--border);
-    background: var(--bg);
-    flex-shrink: 0;
-    display: none;
-    align-items: center;
-    justify-content: center;
-    transition: all 0.15s;
-    font-size: 11px;
-    color: #fff;
-    font-weight: 700;
+    width: 16px; height: 16px; border: 1px solid var(--border); border-radius: 4px;
+    display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #fff; flex-shrink: 0;
   }
   .ms-mode .ms-checkbox { display: flex; }
-  .group-item.ms-selected .ms-checkbox {
-    background: var(--text);
-    border-color: var(--text);
-  }
+  .ms-mode .status-dot { display: none; }
+  .ms-selected { border-color: var(--text); background: #fafafa; }
+  .ms-selected .ms-checkbox { background: var(--text); border-color: var(--text); }
 
-  /* Session badge on next item */
+  .session-banner {
+    display: none; background: #1a1916; color: #fff; padding: 10px 16px;
+    justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 110; font-size: 13px;
+  }
+  .session-banner.active { display: flex; }
+  .session-next { border: 2px solid var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
   .session-badge {
-    display: none;
-    font-size: 10px;
-    font-weight: 700;
-    color: var(--text);
-    background: #fff;
-    border: 1.5px solid var(--text);
-    padding: 2px 8px;
-    border-radius: var(--r-full);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    flex-shrink: 0;
-  }
-  .group-item.session-next .session-badge { display: block; }
-
-  .status-dot {
-    width: 9px; height: 9px;
-    border-radius: 50%;
-    flex-shrink: 0;
-    transition: all 0.25s;
-  }
-  .status-pending .status-dot { background: var(--pending-dot); }
-  .status-done .status-dot { background: var(--approved-dot); }
-  .status-waiting .status-dot { background: var(--waiting-dot); }
-
-  .group-info { flex: 1; min-width: 0; }
-  .group-name {
-    font-size: 14px;
-    font-weight: 500;
-    color: var(--text);
-    line-height: 1.4;
-    transition: color 0.2s;
-  }
-  .status-done .group-name { color: var(--text-dim); text-decoration: line-through; text-decoration-color: var(--text-dim); }
-  .status-waiting .group-name { color: var(--waiting-text); }
-  .session-next .group-name { font-weight: 600; }
-
-  .group-note { font-size: 11px; color: #c07a20; margin-top: 2px; font-style: italic; }
-
-  .group-badge {
-    font-size: 11px;
-    font-weight: 600;
-    padding: 4px 10px;
-    border-radius: var(--r-full);
-    flex-shrink: 0;
-  }
-  .status-pending .group-badge { color: var(--text-dim); background: var(--bg); border: 1.5px solid var(--border); }
-  .status-done .group-badge { color: #fff; background: var(--approved-dot); border: 1.5px solid var(--approved-dot); }
-  .status-waiting .group-badge { color: var(--waiting-text); background: var(--waiting-bg); border: 1.5px solid var(--waiting-border); }
-
-  /* Action buttons row */
-  .group-actions {
-    display: flex;
-    border-top: 1.5px solid var(--border-soft);
-    padding: 6px 8px;
-    gap: 6px;
-  }
-  .status-waiting .group-actions { border-color: var(--waiting-border); }
-
-  .group-action-btn {
-    flex: 1;
-    padding: 9px 4px;
-    background: transparent;
-    border: 1.5px solid transparent;
-    border-radius: var(--r-sm);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 11px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    color: var(--text-mid);
-  }
-  .group-action-btn:active { opacity: 0.6; }
-
-  /* One-tap Post & Mark button — prominent */
-  .group-action-btn.btn-post-mark {
-    background: var(--text);
-    color: #fff;
-    border-color: var(--text);
-    font-weight: 700;
-    font-size: 12px;
-    letter-spacing: 0.2px;
-  }
-  .group-action-btn.btn-post-mark:active { opacity: 0.75; transform: scale(0.98); }
-
-  .group-action-btn.btn-post { color: var(--text-mid); }
-  .group-action-btn.btn-post.active-post { background: var(--approved-bg); color: #fff; border-color: var(--approved-bg); font-weight: 600; }
-
-  .group-action-btn.btn-wait { color: var(--text-mid); }
-  .group-action-btn.btn-wait.active-wait { background: var(--waiting-bg); color: var(--waiting-text); border-color: var(--waiting-border); font-weight: 600; }
-
-  .group-action-btn.btn-delete-item { color: var(--text-dim); }
-  .group-action-btn.btn-delete-item:active { color: #c05050; background: #fff0f0; }
-
-  /* Add group */
-  .add-container {
-    margin-top: 8px;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r);
-    padding: 14px;
+    background: var(--text); color: #fff; font-size: 9px; font-weight: 700;
+    padding: 2px 5px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
   }
 
-  .add-input {
-    width: 100%;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    color: var(--text);
-    font-family: 'Sarabun', sans-serif;
-    font-size: 14px;
-    padding: 11px 14px;
-    outline: none;
-    border-radius: var(--r-sm);
-    transition: border-color 0.2s;
+  .bulk-bar {
+    position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
+    border-top: 1px solid var(--border); padding: 12px 16px cubic-bezier(0.1, 1, 0.1, 1);
+    transform: translateY(100%); transition: transform 0.25s; z-index: 200;
+    display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
   }
-  .add-input::placeholder { color: var(--text-dim); }
-  .add-input:focus { border-color: var(--text); }
-
-  .add-submit-btn {
-    background: var(--text);
-    border: none;
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    padding: 12px;
-    cursor: pointer;
-    border-radius: var(--r-sm);
-    transition: opacity 0.2s;
+  .bulk-bar.visible { transform: translateY(0); }
+  .bulk-info { font-size: 13px; font-weight: 500; }
+  .bulk-ops { display: flex; gap: 6px; }
+  .btn-bulk-act {
+    border: 1px solid var(--border); background: var(--surface); color: var(--text);
+    padding: 6px 12px; border-radius: var(--r-full); font-size: 12px; font-weight: 500; cursor: pointer;
   }
-  .add-submit-btn:active { opacity: 0.75; }
+  .btn-bulk-act.primary { background: var(--text); color: var(--surface); border-color: var(--text); }
 
-  /* ─── BOTTOM BAR ─── */
-  .bottom-bar {
-    position: fixed;
-    bottom: 0; left: 0; right: 0;
-    background: rgba(245,244,240,0.92);
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border-top: 1.5px solid var(--border);
-    padding: 14px 16px 20px;
-    display: flex;
-    gap: 10px;
-    max-width: 480px;
-    margin: 0 auto;
-    z-index: 200;
-  }
-
-  .bar-btn {
-    flex: 1;
-    padding: 14px;
-    border-radius: var(--r-full);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 13px;
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s;
-    border: none;
-  }
-  .bar-btn:active { transform: scale(0.97); }
-
-  .bar-reset { background: var(--surface); color: var(--text-mid); border: 1.5px solid var(--border); }
-  .bar-all-done { background: var(--text); color: #fff; border: none; font-weight: 600; }
-
-  /* ─── TOAST ─── */
+  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 13px; }
   .toast {
-    position: fixed;
-    bottom: 100px;
-    left: 50%;
-    transform: translateX(-50%) translateY(8px);
-    background: var(--text);
-    color: #fff;
-    font-family: 'DM Sans', sans-serif;
-    font-weight: 500;
-    font-size: 12px;
-    letter-spacing: 0.3px;
-    padding: 10px 20px;
-    border-radius: var(--r-full);
-    opacity: 0;
-    transition: all 0.3s;
-    pointer-events: none;
-    white-space: nowrap;
-    z-index: 1000;
+    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
+    background: #1a1916; color: #ffffff; padding: 8px 16px; border-radius: var(--r-full);
+    font-size: 12px; font-weight: 500; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 300;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
   }
   .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-
-  .complete-wrap {
-    text-align: center;
-    padding: 32px 20px;
-    animation: fadeUp 0.5s ease;
+  
+  .automation-status-panel {
+    background: #faf9f5; border: 1px dashed var(--border); border-radius: var(--r-sm);
+    padding: 10px; margin-top: 10px; display: none;
   }
-  .complete-wrap .complete-icon { font-size: 32px; margin-bottom: 8px; }
-  .complete-wrap p { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.3px; }
-
-  .empty-state {
-    text-align: center;
-    padding: 32px 20px;
-    color: var(--text-dim);
-    font-size: 13px;
-    background: var(--surface);
-    border: 1.5px dashed var(--border);
-    border-radius: var(--r);
-    margin-bottom: 10px;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
-  }
-
-  /* ─── TEMPLATE CARDS STRIP ─── */
-  .templates-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-dim);
-    letter-spacing: 0.5px;
-    text-transform: uppercase;
-    margin-bottom: 10px;
-  }
-
-  .templates-scroll {
-    display: flex;
-    gap: 10px;
-    overflow-x: auto;
-    padding-bottom: 6px;
-    margin-bottom: 16px;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .templates-scroll::-webkit-scrollbar { display: none; }
-
-  .template-card {
-    background: var(--surface);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r);
-    padding: 14px;
-    min-width: 200px;
-    max-width: 200px;
-    flex-shrink: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-  }
-
-  .template-card-label {
-    font-size: 11px;
-    font-weight: 600;
-    color: var(--text-dim);
-    letter-spacing: 0.4px;
-  }
-
-  .template-textarea {
-    width: 100%;
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    border-radius: var(--r-sm);
-    color: var(--text);
-    font-family: 'Sarabun', sans-serif;
-    font-size: 13px;
-    line-height: 1.6;
-    padding: 10px 12px;
-    resize: none;
-    min-height: 72px;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-  .template-textarea:focus { border-color: var(--text); }
-  .template-textarea::placeholder { color: var(--text-dim); }
-
-  .template-copy-btn {
-    background: var(--bg);
-    border: 1.5px solid var(--border);
-    color: var(--text-mid);
-    font-family: 'DM Sans', sans-serif;
-    font-size: 12px;
-    font-weight: 500;
-    padding: 9px;
-    border-radius: var(--r-sm);
-    cursor: pointer;
-    transition: all 0.2s;
-    width: 100%;
-  }
-  .template-copy-btn:active { opacity: 0.7; }
-  .template-copy-btn.copied { background: #3a7d52; color: #fff; border-color: #3a7d52; }
-
-  /* Hide action buttons in ms mode (tap row to toggle select) */
-  .ms-mode .group-actions { display: none; }
-  .ms-mode .group-main { cursor: pointer; }
 </style>
 </head>
 <body>
 
+<div id="sessionBanner" class="session-banner">
+  <span id="sessionLabel" style="font-weight:500;">Session Active</span>
+  <button onclick="stopSession()" style="background:transparent;border:none;color:#ff8888;font-size:12px;font-weight:600;cursor:pointer;">Stop Session</button>
+</div>
+
 <div class="header">
-  <div class="header-top">
-    <div class="brand">
-      <span class="brand-sub">Watch Group</span>
-      <span class="brand-title">Posting Board</span>
-    </div>
-    <button class="reset-btn" onclick="resetAll()">Reset All</button>
-  </div>
-  <div class="progress-section">
-    <div class="progress-meta">
-      <span class="label">Progress</span>
-      <span class="count" id="progressText">0 / 0</span>
-    </div>
-    <div class="progress-track">
-      <div class="progress-fill" id="progressBar" style="width:0%"></div>
+  <div class="brand-sub">Watch Group Tracker</div>
+  <div class="brand-row">
+    <h1 class="brand-title">Dashboard</h1>
+    <div class="top-actions">
+      <button class="reset-btn" id="sessionBtn" onclick="toggleSession()">▶ Start Session</button>
+      <button class="reset-btn" onclick="resetDone()">Reset Post</button>
+      <button class="reset-btn" onclick="resetAll()">Clear Board</button>
     </div>
   </div>
 </div>
 
-<!-- Session banner (sticky under header) -->
-<div class="session-banner" id="sessionBanner">
-  <div class="session-info">
-    <div class="session-pulse"></div>
-    <span id="sessionLabel">Session: 0 of 0 done</span>
+<div class="main-card">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <div class="card-title" style="margin-bottom:0;">Server Gateway Engine</div>
+    <div id="serverStatus" class="status-indicator">🔴 Offline</div>
   </div>
-  <button class="session-stop-btn" onclick="stopSession()">Stop</button>
+  <div class="input-group">
+    <input type="text" id="serverUrl" class="input-flat" placeholder="https://your-server.railway.app" oninput="saveServerUrl()">
+    <button class="btn-action" id="pingBtn" onclick="checkServer()">Ping</button>
+  </div>
 </div>
 
-<div class="content">
-  <div class="post-card">
-    <div class="card-label-row">
-      <div class="card-label">Caption</div>
-      <button class="clear-section-btn" onclick="clearCaption()">Clear</button>
-    </div>
-    <textarea class="post-textarea" id="postText" placeholder="วางข้อความที่จะโพสต์ที่นี่..."></textarea>
-    <button class="copy-btn" id="copyBtn" onclick="copyText()">Copy Caption</button>
+<div class="main-card">
+  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
+    <div class="card-title" style="margin-bottom:0;">Universal Post Composer</div>
+    <button class="reset-btn" onclick="clearCaption()">Clear Text</button>
   </div>
-
-  <!-- ─── AUTO-POSTER CARD ─── -->
-  <div class="post-card" id="autoPosterCard">
-    <div class="card-label">🤖 Auto-Poster</div>
-
-    <!-- PC Server URL input -->
-    <div style="margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:6px;">PC SERVER URL (ngrok)</div>
-      <div style="display:flex;gap:8px;align-items:center;">
-        <input id="serverUrl" type="url" placeholder="https://xxxx.ngrok-free.app"
-          style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;"
-          oninput="saveServerUrl()" />
-        <button onclick="checkServer()" id="pingBtn"
-          style="background:var(--surface);border:1.5px solid var(--border);color:var(--text-mid);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:10px 14px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap;">
-          Ping
-        </button>
-      </div>
-      <div id="serverStatus" style="font-size:11px;margin-top:6px;color:var(--text-dim);">Enter your ngrok URL above</div>
+  <div class="composer-box">
+    <textarea id="postText" class="textarea-flat" placeholder="พิมพ์ข้อความโพสต์ตรงนี้..."></textarea>
+    
+    <div id="imageDropZone" style="border: 1px dashed var(--border); padding: 12px; text-align: center; border-radius: 8px; font-size: 12px; color: var(--text-mid);">
+      No images selected
     </div>
+    <div id="imagePreviews" style="display:flex; gap:8px; overflow-x:auto; margin-bottom:4px;"></div>
 
-    <!-- Image upload -->
-    <div style="margin-bottom:12px;">
-      <div class="card-label-row">
-        <div style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;">IMAGES</div>
-        <button class="clear-section-btn" onclick="clearImages()">Clear Images</button>
-      </div>
-      <div id="imageDropZone" onclick="document.getElementById('imageInput').click()"
-        style="border:1.5px dashed var(--border);border-radius:var(--r-sm);padding:16px;text-align:center;cursor:pointer;background:var(--bg);transition:border-color 0.2s;">
-        <div style="font-size:24px;margin-bottom:4px;">📷</div>
-        <div style="font-size:13px;font-weight:500;color:var(--text-mid);">Tap to select images</div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Auto-Compressed for Mobile Speed</div>
-      </div>
-      <input type="file" id="imageInput" accept="image/*" multiple style="display:none;" onchange="handleImages(event)" />
-      <div id="imagePreviews" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
-    </div>
-
-    <!-- Auto-post button -->
-    <button id="autoPostBtn" onclick="startAutoPost()"
-      style="width:100%;background:var(--text);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:14px 20px;border-radius:var(--r-sm);cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;">
-      🚀 Start Auto-Post
-    </button>
-
-    <!-- Stop button (hidden by default) -->
-    <button id="autoStopBtn" onclick="stopAutoPost()"
-      style="display:none;width:100%;background:#c05050;border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:14px 20px;border-radius:var(--r-sm);cursor:pointer;margin-top:8px;">
-      ⛔ Stop Auto-Post
-    </button>
-
-    <!-- Live progress -->
-    <div id="autoProgress" style="display:none;margin-top:12px;">
-      <div style="font-size:12px;font-weight:600;color:var(--text-mid);margin-bottom:6px;" id="autoProgressText">Posting...</div>
-      <div style="background:var(--border);height:6px;border-radius:100px;overflow:hidden;">
-        <div id="autoProgressBar" style="height:6px;background:var(--text);border-radius:100px;width:0%;transition:width 0.5s;"></div>
-      </div>
-      <div id="autoGroupList" style="margin-top:10px;display:flex;flex-direction:column;gap:4px;"></div>
-    </div>
-  </div>
-
-  <!-- Template cards strip -->
-  <div class="post-card" style="padding-bottom:14px;">
-    <div class="templates-label">Templates</div>
-    <div class="templates-scroll">
-      <div class="template-card">
-        <div class="template-card-label"></div>
-        <div class="card-label-row" style="margin-bottom: 2px;">
-          <span class="template-card-label">📌 Header</span>
-          <span class="clear-section-btn" style="font-size:10px;" onclick="clearTemplate('headerText')">Clear</span>
+    <div class="composer-actions">
+      <div style="display:flex; gap:6px;">
+        <div class="media-btn-wrap">
+          <button class="btn-secondary">🖼️ Gallery</button>
+          <input type="file" id="imageInput" class="file-input-hidden" multiple accept="image/*" onchange="handleImages(event)">
         </div>
-        <textarea class="template-textarea" id="headerText" placeholder="หัวข้อโพสต์..." oninput="saveTpl()"></textarea>
-        <button class="template-copy-btn" onclick="copyTpl('headerText', this)">Copy Header</button>
+        <button class="btn-secondary" onclick="clearImages()">🗑️ Clear Pics</button>
+        <button class="btn-secondary" onclick="copyText()">📋 Copy Text</button>
       </div>
-      <div class="template-card">
-        <div class="card-label-row" style="margin-bottom: 2px;">
-          <span class="template-card-label">💬 Group Chat</span>
-          <span class="clear-section-btn" style="font-size:10px;" onclick="clearTemplate('groupChatText')">Clear</span>
-        </div>
-        <textarea class="template-textarea" id="groupChatText" placeholder="ข้อความกลุ่มแชท..." oninput="saveTpl()"></textarea>
-        <button class="template-copy-btn" onclick="copyTpl('groupChatText', this)">Copy Group Chat</button>
-      </div>
-      <div class="template-card">
-        <div class="card-label-row" style="margin-bottom: 2px;">
-          <span class="template-card-label">🔗 Line @</span>
-          <span class="clear-section-btn" style="font-size:10px;" onclick="clearTemplate('lineText')">Clear</span>
-        </div>
-        <textarea class="template-textarea" id="lineText" placeholder="ข้อความ Line @..." oninput="saveTpl()"></textarea>
-        <button class="template-copy-btn" onclick="copyTpl('lineText', this)">Copy Line @</button>
+      <div style="display:flex; gap:6px;">
+        <button class="btn-primary" id="autoStopBtn" style="background:#c05050; display:none;" onclick="stopAutoPost()">■ Stop</button>
+        <button class="btn-primary" id="autoPostBtn" onclick="startAutoPost()">🚀 Start Auto-Post</button>
       </div>
     </div>
+    
+    <div id="autoProgress" class="automation-status-panel">
+      <div id="autoProgressText" style="font-size:12px; font-weight:600; margin-bottom:4px;">Automation Active...</div>
+      <div class="track-bg" style="height:6px; margin-bottom:8px;"><div id="autoProgressBar" class="track-fill" style="background:#3a7d52; width:0%;"></div></div>
+      <div id="autoGroupList" style="max-height:80px; overflow-y:auto;"></div>
+    </div>
   </div>
-
-  <div class="section-divider">
-    <div class="line"></div>
-    <div class="label">Groups</div>
-    <div class="line"></div>
-  </div>
-
-  <!-- Toolbar: session + multi-select -->
-  <div class="toolbar-row">
-    <button class="session-btn" id="sessionBtn" onclick="toggleSession()">▶ Start Session</button>
-    <button class="multiselect-btn" id="msBtn" onclick="toggleMultiSelect()">☑ Select</button>
-  </div>
-
-  <!-- Bulk action bar (shown in multi-select mode) -->
-  <div class="bulk-bar" id="bulkBar">
-    <span class="bulk-count" id="bulkCount">0 selected</span>
-    <button class="bulk-action-btn bulk-select-all-btn" onclick="bulkSelectAll()">All</button>
-    <button class="bulk-action-btn bulk-btn-done" onclick="bulkSetStatus('done')">✓ Posted</button>
-    <button class="bulk-action-btn bulk-btn-wait" onclick="bulkSetStatus('waiting')">⏳ Waiting</button>
-    <button class="bulk-action-btn bulk-btn-reset" onclick="bulkSetStatus('pending')">↺ Reset</button>
-  </div>
-
-  <!-- Filter tabs -->
-  <div class="filter-tabs" id="filterTabs">
-    <button class="filter-tab tab-all active" onclick="setFilter('all')">
-      All <span class="tab-count" id="countAll">0</span>
-    </button>
-    <button class="filter-tab tab-approved" onclick="setFilter('done')">
-      ✓ <span class="tab-count" id="countDone">0</span>
-    </button>
-    <button class="filter-tab tab-waiting" onclick="setFilter('waiting')">
-      ⏳ <span class="tab-count" id="countWaiting">0</span>
-    </button>
-  </div>
-
-  <div id="groupList"></div>
-
-  <div class="add-container">
-    <input class="add-input" id="addInputName" type="text" placeholder="ชื่อกลุ่มใหม่..." maxlength="80">
-    <input class="add-input" id="addInputLink" type="text" placeholder="ลิงก์กลุ่ม Facebook (หากมี)...">
-    <button class="add-submit-btn" onclick="addGroup()">เพิ่มกลุ่ม</button>
-  </div>
-
-  <div id="completeMsg"></div>
 </div>
 
-<div class="bottom-bar">
-  <button class="bar-btn bar-reset" onclick="resetDone()">Reset Status</button>
-  <button class="bar-btn bar-all-done" onclick="markAllDone()">Mark All Done</button>
+<div class="tpl-deck">
+  <div class="tpl-card">
+    <div class="tpl-label">Header Tag</div>
+    <input type="text" id="headerText" class="tpl-input" placeholder="✨ มัดรวมสเปคเด็ด..." oninput="saveTpl()">
+    <div class="tpl-btn-row">
+      <button class="tpl-mini-btn" onclick="copyTpl('headerText', this)">Copy</button>
+      <button class="tpl-mini-btn" onclick="clearTemplate('headerText')">Clear</button>
+    </div>
+  </div>
+  <div class="tpl-card">
+    <div class="tpl-label">Group Chat Link</div>
+    <input type="text" id="groupChatText" class="tpl-input" placeholder="https://openchat..." oninput="saveTpl()">
+    <div class="tpl-btn-row">
+      <button class="tpl-mini-btn" onclick="copyTpl('groupChatText', this)">Copy</button>
+      <button class="tpl-mini-btn" onclick="clearTemplate('groupChatText')">Clear</button>
+    </div>
+  </div>
+  <div class="tpl-card">
+    <div class="tpl-label">Line Contact</div>
+    <input type="text" id="lineText" class="tpl-input" placeholder="ID: @supwatch" oninput="saveTpl()">
+    <div class="tpl-btn-row">
+      <button class="tpl-mini-btn" onclick="copyTpl('lineText', this)">Copy</button>
+      <button class="tpl-mini-btn" onclick="clearTemplate('lineText')">Clear</button>
+    </div>
+  </div>
 </div>
 
-<div class="toast" id="toast"></div>
+<div class="main-card" style="padding:12px 14px; margin-bottom:12px;">
+  <div class="card-title" style="margin-bottom:8px; font-size:12px;">Add Custom Targeted Group</div>
+  <div style="display:flex; flex-direction:column; gap:6px;">
+    <input type="text" id="addInputName" class="input-flat" placeholder="ชื่อกลุ่มภาษาไทยหรืออังกฤษ" style="padding:8px 12px; font-size:13px;">
+    <div class="input-group" style="margin-bottom:0;">
+      <input type="text" id="addInputLink" class="input-flat" placeholder="https://www.facebook.com/share/g/..." style="padding:8px 12px; font-size:13px;">
+      <button class="btn-action" onclick="addGroup()" style="font-size:12px; padding:0 14px;">+ Add</button>
+    </div>
+  </div>
+</div>
+
+<div class="sticky-filter-bar">
+  <div class="filter-tabs">
+    <button class="filter-tab tab-all active" onclick="setFilter('all')">All (<span id="countAll">0</span>)</button>
+    <button class="filter-tab tab-approved" onclick="setFilter('done')">Posted (<span id="countDone">0</span>)</button>
+    <button class="filter-tab tab-waiting" onclick="setFilter('waiting')">Waiting (<span id="countWaiting">0</span>)</button>
+  </div>
+  <button class="ms-btn" id="msBtn" onclick="toggleMultiSelect()">☑ Select</button>
+</div>
+
+<div class="progress-section">
+  <div class="progress-meta">
+    <span>Campaign Completion</span>
+    <span id="progressText">0 / 0</span>
+  </div>
+  <div class="track-bg"><div id="progressBar" class="track-fill"></div></div>
+</div>
+
+<div class="list-container" id="groupList"></div>
+
+<div class="bulk-bar" id="bulkBar">
+  <div class="bulk-info" id="bulkCount">0 selected</div>
+  <div class="bulk-ops">
+    <button class="btn-bulk-act" onclick="bulkSelectAll()">Select All</button>
+    <button class="btn-bulk-act" onclick="bulkSetStatus('waiting')">Set Waiting</button>
+    <button class="btn-bulk-act primary" onclick="bulkSetStatus('done')">Set Posted</button>
+  </div>
+</div>
+
+<div id="toast" class="toast">Action Complete</div>
 
 <script>
 const defaultGroups = [
@@ -927,8 +389,9 @@ let sessionMode = false;
 let multiSelectMode = false;
 let selectedIds = new Set();
 let selectedImages = [];
+let autoPostInterval = null;
 
-// ─── DATA ───
+// ─── DATA CORE ───
 function loadData() {
   try {
     const saved = localStorage.getItem('watchGroupsV4');
@@ -953,7 +416,7 @@ function saveData() {
   localStorage.setItem('postText', document.getElementById('postText').value);
 }
 
-// ─── SECTION CLEAR BUTTONS ───
+// ─── MANUAL ACTION BUTTON HOOKS ───
 function clearCaption() {
   document.getElementById('postText').value = '';
   saveData();
@@ -974,7 +437,6 @@ function clearTemplate(id) {
   showToast('Template cleared');
 }
 
-// ─── FILTER ───
 function setFilter(f) {
   currentFilter = f;
   document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
@@ -983,7 +445,6 @@ function setFilter(f) {
   render();
 }
 
-// ─── ONE-TAP POST & MARK ───
 function launchLink(id) {
   const g = groups.find(x => x.id === id);
   if (!g) return;
@@ -994,24 +455,17 @@ function launchLink(id) {
   } else {
     showToast('Opening group ↗');
   }
-  if (g.status === 'pending') {
-    g.status = 'waiting';
-  }
+  if (g.status === 'pending') g.status = 'waiting';
   saveData(); render();
   if (g.link) window.open(g.link, '_blank');
-  else showToast('No link for this group');
 }
 
 function handleGroupMainClick(id) {
-  if (multiSelectMode) {
-    toggleSelect(id);
-    return;
-  }
+  if (multiSelectMode) { toggleSelect(id); return; }
   const g = groups.find(x => x.id === id);
   if (!g) return;
   g.status = (g.status === 'done') ? 'pending' : 'done';
   saveData(); render();
-  showToast(g.status === 'done' ? 'Marked as Posted ✓' : 'Reset to Pending');
 }
 
 function setStatus(id, status) {
@@ -1019,13 +473,10 @@ function setStatus(id, status) {
   if (!g) return;
   g.status = (g.status === status) ? 'pending' : status;
   saveData(); render();
-  if (g.status === 'done') showToast('Posted ✓');
-  else if (g.status === 'waiting') showToast('Waiting for Approval');
-  else showToast('Reset to Pending');
   if (sessionMode) scrollToNextPending();
 }
 
-// ─── MULTI-SELECT BULK ACTIONS ───
+// ─── BULK EDITING ───
 function toggleMultiSelect() {
   multiSelectMode = !multiSelectMode;
   selectedIds.clear();
@@ -1033,8 +484,7 @@ function toggleMultiSelect() {
   btn.classList.toggle('ms-active', multiSelectMode);
   btn.textContent = multiSelectMode ? '✕ Cancel' : '☑ Select';
   document.getElementById('groupList').classList.toggle('ms-mode', multiSelectMode);
-  const bulkBar = document.getElementById('bulkBar');
-  bulkBar.classList.toggle('visible', multiSelectMode);
+  document.getElementById('bulkBar').classList.toggle('visible', multiSelectMode);
   updateBulkCount();
   render();
 }
@@ -1049,34 +499,23 @@ function toggleSelect(id) {
 function bulkSelectAll() {
   const visible = getVisible();
   const allSelected = visible.every(g => selectedIds.has(g.id));
-  if (allSelected) {
-    visible.forEach(g => selectedIds.delete(g.id));
-  } else {
-    visible.forEach(g => selectedIds.add(g.id));
-  }
-  updateBulkCount();
-  render();
+  visible.forEach(g => allSelected ? selectedIds.delete(g.id) : selectedIds.add(g.id));
+  updateBulkCount(); render();
 }
 
 function bulkSetStatus(status) {
-  if (selectedIds.size === 0) { showToast('No groups selected'); return; }
-  groups.forEach(g => {
-    if (selectedIds.has(g.id)) g.status = status;
-  });
-  const n = selectedIds.size;
+  if (selectedIds.size === 0) return;
+  groups.forEach(g => { if (selectedIds.has(g.id)) g.status = status; });
   selectedIds.clear();
-  saveData(); render();
-  const labels = { done: `${n} marked Posted ✓`, waiting: `${n} marked Waiting`, pending: `${n} reset` };
-  showToast(labels[status] || 'Done');
-  updateBulkCount();
+  saveData(); render(); updateBulkCount();
+  showToast('Statuses updated');
 }
 
 function updateBulkCount() {
-  document.getElementById('bulkCount').textContent =
-    selectedIds.size === 0 ? 'Tap groups to select' : `${selectedIds.size} selected`;
+  document.getElementById('bulkCount').textContent = `${selectedIds.size} selected`;
 }
 
-// ─── SESSION MODE ───
+// ─── SEMI-AUTO SEMANTIC SESSIONS ───
 function toggleSession() {
   sessionMode = !sessionMode;
   const btn = document.getElementById('sessionBtn');
@@ -1085,26 +524,19 @@ function toggleSession() {
     btn.textContent = '■ End Session';
     btn.classList.add('session-active');
     banner.classList.add('active');
-    render();
-    scrollToNextPending();
-  } else {
-    stopSession();
-  }
+    render(); scrollToNextPending();
+  } else { stopSession(); }
 }
 
 function stopSession() {
   sessionMode = false;
-  const btn = document.getElementById('sessionBtn');
-  btn.textContent = '▶ Start Session';
-  btn.classList.remove('session-active');
+  document.getElementById('sessionBtn').textContent = '▶ Start Session';
+  document.getElementById('sessionBtn').classList.remove('session-active');
   document.getElementById('sessionBanner').classList.remove('active');
   render();
 }
 
-function getNextPending() {
-  return groups.find(g => g.status === 'pending') || null;
-}
-
+function getNextPending() { return groups.find(g => g.status === 'pending') || null; }
 function scrollToNextPending() {
   setTimeout(() => {
     const nextEl = document.querySelector('.group-item.session-next');
@@ -1112,17 +544,8 @@ function scrollToNextPending() {
   }, 100);
 }
 
-function updateSessionBanner() {
-  const done = groups.filter(g => g.status === 'done').length;
-  const total = groups.length;
-  document.getElementById('sessionLabel').textContent = `Session — ${done} of ${total} posted`;
-}
-
-// ─── RENDER ───
-function getVisible() {
-  return currentFilter === 'all' ? groups : groups.filter(g => g.status === currentFilter);
-}
-
+// ─── RENDERING MECHANICS ───
+function getVisible() { return currentFilter === 'all' ? groups : groups.filter(g => g.status === currentFilter); }
 function render() {
   const list = document.getElementById('groupList');
   const done = groups.filter(g => g.status === 'done').length;
@@ -1135,229 +558,112 @@ function render() {
   document.getElementById('countDone').textContent = done;
   document.getElementById('countWaiting').textContent = waiting;
 
-  if (sessionMode) updateSessionBanner();
+  if (sessionMode) {
+    document.getElementById('sessionLabel').textContent = `Session — ${done} of ${total} posted`;
+  }
 
   const nextPendingId = sessionMode ? (getNextPending()?.id ?? null) : null;
   const visible = getVisible();
 
-  if (multiSelectMode) list.classList.add('ms-mode');
-  else list.classList.remove('ms-mode');
-
   if (visible.length === 0) {
-    const labels = { all: 'No groups yet', done: 'None approved yet', waiting: 'None waiting' };
-    list.innerHTML = `<div class="empty-state">${labels[currentFilter] || 'No groups'}</div>`;
-  } else {
-    list.innerHTML = visible.map(g => {
-      const isDone = g.status === 'done';
-      const isWait = g.status === 'waiting';
-      const isNext = g.id === nextPendingId;
-      const isSelected = selectedIds.has(g.id);
-      const badgeText = isDone ? 'Posted' : isWait ? 'Waiting' : 'Pending';
-
-      let classes = `group-item status-${g.status}`;
-      if (isNext) classes += ' session-next';
-      if (isSelected) classes += ' ms-selected';
-
-      return `
-      <div class="${classes}" data-id="${g.id}">
-        <div class="group-main" onclick="handleGroupMainClick(${g.id})">
-          <div class="ms-checkbox">${isSelected ? '✓' : ''}</div>
-          <div class="status-dot"></div>
-          <div class="group-info">
-            <div class="group-name">${g.name}</div>
-            ${g.note ? `<div class="group-note">${g.note}</div>` : ''}
-          </div>
-          ${isNext ? `<span class="session-badge">Next</span>` : ''}
-          <div class="group-badge">${badgeText}</div>
-        </div>
-        <div class="group-actions">
-          ${g.link ? `<button class="group-action-btn btn-post-mark" onclick="launchLink(${g.id}); event.stopPropagation();">เปิด & โพสต์ ↗</button>` : ''}
-          <button class="group-action-btn btn-post ${isDone ? 'active-post' : ''}" onclick="setStatus(${g.id}, 'done'); event.stopPropagation();">โพสต์แล้ว</button>
-          <button class="group-action-btn btn-wait ${isWait ? 'active-wait' : ''}" onclick="setStatus(${g.id}, 'waiting'); event.stopPropagation();">รออนุมัติ</button>
-          <button class="group-action-btn btn-delete-item" onclick="deleteGroup(${g.id}); event.stopPropagation();">ลบ</button>
-        </div>
-      </div>`;
-    }).join('');
+    list.innerHTML = `<div class="empty-state">No groups match this filter</div>`;
+    return;
   }
 
-  const msg = document.getElementById('completeMsg');
-  if (done === total && total > 0 && currentFilter === 'all') {
-    if (sessionMode) stopSession();
-    msg.innerHTML = `<div class="complete-wrap"><div class="complete-icon">✦</div><p>All groups posted!</p></div>`;
-  } else {
-    msg.innerHTML = '';
-  }
+  list.innerHTML = visible.map(g => {
+    const isDone = g.status === 'done';
+    const isWait = g.status === 'waiting';
+    const isNext = g.id === nextPendingId;
+    const isSelected = selectedIds.has(g.id);
+    return `
+    <div class="group-item status-${g.status} ${isNext ? 'session-next' : ''} ${isSelected ? 'ms-selected' : ''}">
+      <div class="group-main" onclick="handleGroupMainClick(${g.id})">
+        <div class="ms-checkbox">${isSelected ? '✓' : ''}</div>
+        <div class="status-dot"></div>
+        <div class="group-info">
+          <div class="group-name">${g.name}</div>
+          ${g.note ? `<div class="group-note">${g.note}</div>` : ''}
+        </div>
+        ${isNext ? `<span class="session-badge">Next</span>` : ''}
+        <div class="group-badge">${isDone ? 'Posted' : isWait ? 'Waiting' : 'Pending'}</div>
+      </div>
+      <div class="group-actions">
+        ${g.link ? `<button class="group-action-btn btn-post-mark" onclick="launchLink(${g.id}); event.stopPropagation();">เปิด & โพสต์ ↗</button>` : ''}
+        <button class="group-action-btn btn-post ${isDone ? 'active-post' : ''}" onclick="setStatus(${g.id}, 'done'); event.stopPropagation();">โพสต์แล้ว</button>
+        <button class="group-action-btn btn-wait ${isWait ? 'active-wait' : ''}" onclick="setStatus(${g.id}, 'waiting'); event.stopPropagation();">รออนุมัติ</button>
+        <button class="group-action-btn btn-delete-item" onclick="deleteGroup(${g.id}); event.stopPropagation();">ลบ</button>
+      </div>
+    </div>`;
+  }).join('');
 }
 
-// ─── OTHER ───
 function deleteGroup(id) {
-  const g = groups.find(x => x.id === id);
-  if (!g) return;
-  if (confirm(`ลบกลุ่ม "${g.name}"?`)) {
-    groups = groups.filter(x => x.id !== id);
-    selectedIds.delete(id);
-    showToast('Group deleted');
-    saveData(); render();
-  }
+  if (confirm('ลบกลุ่มนี้?')) { groups = groups.filter(x => x.id !== id); saveData(); render(); }
 }
-
 function addGroup() {
-  const nameInput = document.getElementById('addInputName');
-  const linkInput = document.getElementById('addInputLink');
-  const name = nameInput.value.trim();
-  const link = linkInput.value.trim();
-  if (!name) { showToast('Enter a group name'); return; }
-  groups.push({ id: nextId++, name, note: '', link: link || '', status: 'pending' });
-  nameInput.value = ''; linkInput.value = '';
-  showToast('Group added');
-  saveData(); render();
+  const nInput = document.getElementById('addInputName');
+  const lInput = document.getElementById('addInputLink');
+  if (!nInput.value.trim()) return;
+  groups.push({ id: nextId++, name: nInput.value.trim(), note: '', link: lInput.value.trim(), status: 'pending' });
+  nInput.value = ''; lInput.value = ''; saveData(); render();
 }
-
-function resetDone() {
-  groups.forEach(g => g.status = 'pending');
-  showToast('Status reset');
-  saveData(); render();
-}
-
-function markAllDone() {
-  groups.forEach(g => g.status = 'done');
-  showToast('All marked posted');
-  saveData(); render();
-}
-
-function resetAll() {
-  if (!confirm('รีเซ็ตทุกอย่างกลับเป็นค่าเริ่มต้น?')) return;
-  groups = initGroups();
-  nextId = 100;
-  selectedIds.clear();
-  if (sessionMode) stopSession();
-  if (multiSelectMode) toggleMultiSelect();
-  saveData(); render();
-  showToast('Reset complete');
-}
-
+function resetDone() { groups.forEach(g => g.status = 'pending'); saveData(); render(); }
+function markAllDone() { groups.forEach(g => g.status = 'done'); saveData(); render(); }
+function resetAll() { if (confirm('Reset Board?')) { groups = initGroups(); nextId = 100; saveData(); render(); } }
 function copyText() {
-  const text = document.getElementById('postText').value;
-  if (!text.trim()) { showToast('No caption to copy'); return; }
-  navigator.clipboard.writeText(text).then(() => {
-    const btn = document.getElementById('copyBtn');
-    btn.classList.add('copied');
-    btn.textContent = 'Copied ✓';
-    showToast('Caption copied');
-    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = 'Copy Caption'; }, 2000);
-  }).catch(() => showToast('Copy failed'));
+  navigator.clipboard.writeText(document.getElementById('postText').value);
+  showToast('Copied text!');
 }
-
-document.getElementById('postText').addEventListener('input', saveData);
-
 function saveTpl() {
   localStorage.setItem('tpl_header', document.getElementById('headerText').value);
   localStorage.setItem('tpl_groupchat', document.getElementById('groupChatText').value);
   localStorage.setItem('tpl_line', document.getElementById('lineText').value);
 }
-
 function loadTpl() {
-  const h = localStorage.getItem('tpl_header');
-  const g = localStorage.getItem('tpl_groupchat');
-  const l = localStorage.getItem('tpl_line');
-  if (h) document.getElementById('headerText').value = h;
-  if (g) document.getElementById('groupChatText').value = g;
-  if (l) document.getElementById('lineText').value = l;
+  document.getElementById('headerText').value = localStorage.getItem('tpl_header') || '';
+  document.getElementById('groupChatText').value = localStorage.getItem('tpl_groupchat') || '';
+  document.getElementById('lineText').value = localStorage.getItem('tpl_line') || '';
+}
+function copyTpl(id, btn) { navigator.clipboard.writeText(document.getElementById(id).value); showToast('Copied Template'); }
+
+let tTimer;
+function showToast(m) {
+  const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show');
+  clearTimeout(tTimer); tTimer = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-function copyTpl(fieldId, btn) {
-  const text = document.getElementById(fieldId).value;
-  if (!text.trim()) { showToast('Nothing to copy'); return; }
-  navigator.clipboard.writeText(text).then(() => {
-    const orig = btn.textContent;
-    btn.classList.add('copied');
-    btn.textContent = 'Copied ✓';
-    showToast('Copied ✓');
-    setTimeout(() => { btn.classList.remove('copied'); btn.textContent = orig; }, 2000);
-  }).catch(() => showToast('Copy failed'));
-}
-
-let toastTimer;
-function showToast(msg) {
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.classList.add('show');
-  clearTimeout(toastTimer);
-  toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
-}
-
-// ─── AUTO-POSTER + MOBILE BLISTERING COMPRESSION ───
-let autoPostInterval = null;
-
-function saveServerUrl() {
-  localStorage.setItem('serverUrl', document.getElementById('serverUrl').value);
-}
-
-function loadServerUrl() {
-  const saved = localStorage.getItem('serverUrl');
-  if (saved) document.getElementById('serverUrl').value = saved;
-}
-
-async function getServerUrl() {
-  return (document.getElementById('serverUrl').value || '').replace(/\/$/, '');
-}
+// ─── SERVER INTERACTION ───
+function saveServerUrl() { localStorage.setItem('serverUrl', document.getElementById('serverUrl').value); }
+function loadServerUrl() { document.getElementById('serverUrl').value = localStorage.getItem('serverUrl') || ''; }
+function getServerUrl() { return (document.getElementById('serverUrl').value || '').replace(/\/$/, ''); }
 
 async function checkServer() {
-  const url = await getServerUrl();
-  const btn = document.getElementById('pingBtn');
-  const status = document.getElementById('serverStatus');
-  if (!url) { status.textContent = '⚠️ Enter a server URL first'; status.style.color = '#c07a20'; return; }
-  btn.textContent = '...';
+  const url = getServerUrl();
+  if (!url) return;
+  document.getElementById('pingBtn').textContent = '...';
   try {
-    const res = await fetch(`${url}/status`, { signal: AbortSignal.timeout(5000) });
+    const res = await fetch(`${url}/status`, { signal: AbortSignal.timeout(4000) });
     const data = await res.json();
-    if (data.online) {
-      status.textContent = '🟢 PC server is online and ready!';
-      status.style.color = '#3a7d52';
-    }
-  } catch {
-    status.textContent = '🔴 Cannot reach server. Is ngrok running?';
-    status.style.color = '#c05050';
-  }
-  btn.textContent = 'Ping';
+    document.getElementById('serverStatus').textContent = data.online ? '🟢 Connected' : '🔴 Server Issue';
+  } catch { document.getElementById('serverStatus').textContent = '🔴 Offline'; }
+  document.getElementById('pingBtn').textContent = 'Ping';
 }
 
-// Mobile Compressor: Downscales images on phone canvas before shipping out over network
 function compressImage(file) {
   return new Promise((resolve) => {
     const reader = new FileReader();
     reader.readAsDataURL(file);
-    reader.onload = (event) => {
+    reader.onload = (e) => {
       const img = new Image();
-      img.src = event.target.result;
+      img.src = e.target.result;
       img.onload = () => {
         const canvas = document.createElement('canvas');
-        let width = img.width;
-        let height = img.height;
-        
-        // Cap max resolution at 1600px width/height while maintaining aspect ratios
-        const MAX_SIZE = 1600;
-        if (width > height && width > MAX_SIZE) {
-          height *= MAX_SIZE / width;
-          width = MAX_SIZE;
-        } else if (height > MAX_SIZE) {
-          width *= MAX_SIZE / height;
-          height = MAX_SIZE;
-        }
-        
-        canvas.width = width;
-        canvas.height = height;
-        const ctx = canvas.getContext('2d');
-        ctx.drawImage(img, 0, 0, width, height);
-        
-        // Convert canvas output to blob file optimized to 85% JPEG quality standard
-        canvas.toBlob((blob) => {
-          const compressedFile = new File([blob], file.name, {
-            type: 'image/jpeg',
-            lastModified: Date.now()
-          });
-          resolve(compressedFile);
-        }, 'image/jpeg', 0.85);
+        let w = img.width, h = img.height;
+        if (w > h && w > 1600) { h *= 1600 / w; w = 1600; }
+        else if (h > 1600) { w *= 1600 / h; h = 1600; }
+        canvas.width = w; canvas.height = h;
+        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
+        canvas.toBlob((b) => resolve(new File([b], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.85);
       };
     };
   });
@@ -1366,171 +672,138 @@ function compressImage(file) {
 async function handleImages(e) {
   const files = Array.from(e.target.files);
   if (!files.length) return;
-  
-  showToast('⚡ Optimizing watch images...');
+  showToast('⚡ Compressing...');
   selectedImages = [];
-  
-  for (let file of files) {
-    if (file.type.startsWith('image/')) {
-      const optimized = await compressImage(file);
-      selectedImages.push(optimized);
-    } else {
-      selectedImages.push(file);
-    }
+  for (let f of files) {
+    if (f.type.startsWith('image/')) { selectedImages.push(await compressImage(f)); }
+    else { selectedImages.push(f); }
   }
-  
   const previews = document.getElementById('imagePreviews');
   previews.innerHTML = '';
   selectedImages.forEach((file, i) => {
     const url = URL.createObjectURL(file);
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;width:70px;height:70px;';
-    wrap.innerHTML = `
-      <img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);" />
-      <button onclick="removeImage(${i}); event.stopPropagation();" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#c05050;border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-    `;
+    wrap.style.cssText = 'position:relative;width:70px;height:70px;flex-shrink:0;';
+    wrap.innerHTML = `<img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;" />
+      <button onclick="removeImage(${i}); event.stopPropagation();" style="position:absolute;top:-5px;right:-5px;background:#c05050;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;">✕</button>`;
     previews.appendChild(wrap);
   });
-  
-  const zone = document.getElementById('imageDropZone');
-  zone.style.display = selectedImages.length ? 'none' : 'block';
-  showToast(`✅ ${selectedImages.length} Images compressed & ready!`);
+  document.getElementById('imageDropZone').style.display = selectedImages.length ? 'none' : 'block';
+  showToast('Ready!');
 }
 
-function removeImage(index) {
-  selectedImages.splice(index, 1);
+function removeImage(i) {
+  selectedImages.splice(i, 1);
+  const fakeEvent = { target: { files: [] } };
   const previews = document.getElementById('imagePreviews');
   previews.innerHTML = '';
-  selectedImages.forEach((file, i) => {
+  selectedImages.forEach((file, idx) => {
     const url = URL.createObjectURL(file);
     const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;width:70px;height:70px;';
-    wrap.innerHTML = `
-      <img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);" />
-      <button onclick="removeImage(${i}); event.stopPropagation();" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#c05050;border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
-    `;
+    wrap.style.cssText = 'position:relative;width:70px;height:70px;flex-shrink:0;';
+    wrap.innerHTML = `<img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;" />
+      <button onclick="removeImage(${idx}); event.stopPropagation();" style="position:absolute;top:-5px;right:-5px;background:#c05050;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;">✕</button>`;
     previews.appendChild(wrap);
   });
-  const zone = document.getElementById('imageDropZone');
-  zone.style.display = selectedImages.length ? 'none' : 'block';
+  document.getElementById('imageDropZone').style.display = selectedImages.length ? 'none' : 'block';
 }
 
+// ─── SERVER DEPLOYMENT ENGINES ───
 async function startAutoPost() {
-  const url = await getServerUrl();
-  if (!url) { showToast('Enter ngrok URL first'); return; }
-
+  const url = getServerUrl();
   const caption = document.getElementById('postText').value.trim();
-  if (!caption) { showToast('Add a caption first'); return; }
+  if (!url || !caption) { showToast('Missing URL or Caption'); return; }
 
-  // Option A Strategy Selection Logic
   let targetGroups = [];
-  if (selectedIds.size > 0) {
+  if (selectedIds && selectedIds.size > 0) {
     targetGroups = groups.filter(g => selectedIds.has(g.id) && g.link);
   } else {
     targetGroups = groups.filter(g => g.status === 'pending' && g.link);
   }
 
-  if (targetGroups.length === 0) { showToast('No matching active groups selected'); return; }
-
-  if (!confirm(`Auto-post to ${targetGroups.length} groups?\n\nImages are optimized for ultra-fast network delivery.`)) return;
+  if (targetGroups.length === 0) { showToast('No pending targets'); return; }
 
   const formData = new FormData();
   formData.append('caption', caption);
-  formData.append('groups', JSON.stringify(targetGroups));
-  selectedImages.forEach(img => formData.append('images', img));
+  formData.append('groups', JSON.stringify(targetGroups.map(g => ({ id: g.id, name: g.name, link: g.link }))));
+  
+  if (selectedImages && selectedImages.length > 0) {
+    selectedImages.forEach(img => formData.append('images', img));
+  }
 
   const btn = document.getElementById('autoPostBtn');
-  btn.textContent = '⏳ Sending to PC...';
-  btn.style.opacity = '0.7';
-  btn.disabled = true;
+  btn.textContent = '⏳ Deploying...'; btn.disabled = true;
 
   try {
     const res = await fetch(`${url}/start`, { method: 'POST', body: formData });
     const data = await res.json();
-    if (!data.ok) throw new Error(data.error || 'Unknown error');
+    if (!data.ok) throw new Error(data.error);
 
-    showToast(`✅ Deployment sequence triggered on PC!`);
-    btn.textContent = '⚡ Running Automation...';
-
+    showToast('🚀 Running!');
     document.getElementById('autoStopBtn').style.display = 'block';
     document.getElementById('autoProgress').style.display = 'block';
+    if (typeof multiSelectMode !== 'undefined' && multiSelectMode) toggleMultiSelect();
     
-    if (multiSelectMode) toggleMultiSelect();
     startProgressPolling(url, targetGroups.length);
-
   } catch (err) {
-    showToast('❌ Failed: ' + err.message);
-    btn.textContent = '🚀 Start Auto-Post';
-    btn.style.opacity = '1';
-    btn.disabled = false;
+    showToast('❌ Error: ' + err.message);
+    btn.textContent = '🚀 Start Auto-Post'; btn.disabled = false;
   }
 }
 
-async function stopAutoPost() {
-  const url = await getServerUrl();
-  try { await fetch(`${url}/stop`, { method: 'POST' }); } catch {}
-  clearInterval(autoPostInterval);
-  document.getElementById('autoStopBtn').style.display = 'none';
-  document.getElementById('autoProgress').style.display = 'none';
-  document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post';
-  document.getElementById('autoPostBtn').disabled = false;
-  document.getElementById('autoPostBtn').style.opacity = '1';
-  showToast('Auto-post stopped');
-}
-
-function startProgressPolling(url, total) {
+function startProgressPolling(url, totalCount) {
   clearInterval(autoPostInterval);
   autoPostInterval = setInterval(async () => {
     try {
       const res = await fetch(`${url}/status`);
       const data = await res.json();
       
-      // Clean mapping translation matching our backend layout structure
-      const done = data.session?.progress?.done || 0;
-      const pct = total ? (done / total * 100) : 0;
+      const done = data.session?.progress?.done || data.session?.done || 0;
+      const pct = totalCount ? (done / totalCount * 100) : 0;
 
       document.getElementById('autoProgressBar').style.width = pct + '%';
-      document.getElementById('autoProgressText').textContent = `Posting... ${done} / ${total} groups complete`;
+      document.getElementById('autoProgressText').textContent = `Automation: ${done} / ${totalCount} Done`;
 
-      if (data.session && data.session.groups) {
-        document.getElementById('autoGroupList').innerHTML = data.session.groups.map(g => {
-          const icons = { done: '✅', failed: '❌', pending: '⏳' };
-          const colors = { done: '#3a7d52', failed: '#c05050', pending: 'var(--text-dim)' };
-          return `<div style="font-size:12px;color:${colors[g.status] || 'var(--text-dim)'};display:flex;align-items:center;gap:6px;">
-            <span>${icons[g.status] || '⏳'}</span><span>${g.name}</span>
-          </div>`;
+      const serverGroups = data.session?.groups || data.groups;
+      if (serverGroups) {
+        document.getElementById('autoGroupList').innerHTML = serverGroups.map(g => {
+          const color = g.status === 'done' ? '#3a7d52' : g.status === 'failed' ? '#c05050' : '#8a857c';
+          const sym = g.status === 'done' ? '✅' : g.status === 'failed' ? '❌' : '⏳';
+          return `<div style="font-size:12px;color:${color};margin-bottom:2px;">${sym} ${g.name}</div>`;
         }).join('');
 
-        // Sync data variables cleanly back into localStorage state arrays
-        data.session.groups.forEach(serverGroup => {
-          const local = groups.find(g => g.id === serverGroup.id);
+        serverGroups.forEach(serverGroup => {
+          const local = groups.find(x => x.id === serverGroup.id);
           if (local && serverGroup.status !== 'pending' && local.status !== serverGroup.status) {
             local.status = serverGroup.status;
             saveData();
           }
         });
-        render();
+        if (typeof render === 'function') render();
       }
 
-      if (done >= total || (!data.running && done > 0)) {
+      if (done >= totalCount || (!data.running && done > 0)) {
         clearInterval(autoPostInterval);
-        document.getElementById('autoProgressText').textContent = `✅ All ${total} groups processed completely!`;
         document.getElementById('autoStopBtn').style.display = 'none';
         document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post';
         document.getElementById('autoPostBtn').disabled = false;
-        document.getElementById('autoPostBtn').style.opacity = '1';
-        showToast('🎉 Auto-posting session complete!');
+        showToast('🎉 Session Completed!');
       }
-    } catch (e) {
-      console.error("Polling validation mismatch:", e);
-    }
-  }, 4000);
+    } catch (e) {}
+  }, 3500);
 }
 
-loadData();
-loadTpl();
-loadServerUrl();
-render();
+async function stopAutoPost() {
+  try { await fetch(`${getServerUrl()}/stop`, { method: 'POST' }); } catch{}
+  clearInterval(autoPostInterval);
+  document.getElementById('autoStopBtn').style.display = 'none';
+  document.getElementById('autoProgress').style.display = 'none';
+  document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post';
+  document.getElementById('autoPostBtn').disabled = false;
+}
+
+document.getElementById('postText').addEventListener('input', saveData);
+loadData(); loadTpl(); loadServerUrl(); render();
 </script>
 </body>
 </html>
