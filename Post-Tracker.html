@@ -5,11 +5,13 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
     <title>PostTracker - Editorial Dashboard</title>
     
+    <!-- Fonts & Icons -->
     <link href="https://fonts.googleapis.com" rel="preconnect"/>
     <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
     <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
     
+    <!-- Tailwind Engine -->
     <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
     <script id="tailwind-config">
         tailwind.config = {
@@ -36,8 +38,7 @@
                 "surface-container-highest": "#e4e2e2",
                 "inverse-surface": "#303031",
                 "on-primary-fixed": "#1c1b1b",
-                "surface-container-low": "#f5f3f3",
-                "surface": "#fbf9f8",
+                "on-primary-container": "#858383",
                 "on-secondary": "#ffffff",
                 "on-secondary-container": "#616363",
                 "on-primary-fixed-variant": "#474646",
@@ -51,7 +52,7 @@
                 "on-error": "#ffffff",
                 "outline": "#747878",
                 "on-tertiary-fixed-variant": "#464744",
-                "on-primary-container": "#858383",
+                "on-secondary-fixed-dim": "#c6c6c7",
                 "on-tertiary": "#ffffff",
                 "secondary": "#5d5f5f",
                 "on-tertiary-fixed": "#1b1c1a",
@@ -128,15 +129,17 @@
 </head>
 <body class="bg-background text-on-background font-body-md min-h-screen pb-24 md:pb-0">
 
+    <!-- Top Navigation Bar -->
     <header class="fixed top-0 w-full z-50 flex justify-between items-center px-4 md:px-margin-desktop h-16 bg-surface border-b border-surface-variant">
         <div class="flex items-center gap-stack-sm">
             <span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
             <h1 class="font-headline-sm text-[20px] md:text-headline-sm font-bold text-primary">PostTracker</h1>
         </div>
         
-        <div class="flex items-center gap-4">
-            <input id="railwayUrlInput" type="text" placeholder="https://your-railway.app" onchange="saveConfig()" class="hidden md:block text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-64 focus:ring-1 focus:ring-primary">
-            <input id="secretKeyInput" type="password" placeholder="Secret Key" onchange="saveConfig()" class="hidden md:block text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-32 focus:ring-1 focus:ring-primary">
+        <!-- Live Engine Server Configurations Locked In -->
+        <div class="hidden md:flex items-center gap-4">
+            <input id="railwayUrlInput" type="text" placeholder="https://your-railway.app" onchange="saveConfig()" class="text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-64 focus:ring-1 focus:ring-primary">
+            <input id="secretKeyInput" type="password" placeholder="Secret Key" onchange="saveConfig()" class="text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-32 focus:ring-1 focus:ring-primary">
         </div>
 
         <div class="flex items-center gap-stack-md">
@@ -144,25 +147,28 @@
                 <span id="statusIndicator" class="w-2 h-2 rounded-full bg-gray-400"></span> 
                 <span id="statusText">CHECKING</span>
             </div>
-            <button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" id="newGroupBtn" onclick="openAddGroupModal()">
-                Add Group
+            <button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all active:scale-95" id="sessionBtn" onclick="toggleSession()">
+                New Session
             </button>
         </div>
     </header>
 
-    <main class="pt-24 pb-12 px-4 md:px-margin-desktop max-w-container-max mx-auto space-y-stack-lg">
+    <!-- Main Workspace Dashboard Content -->
+    <main class="pt-24 pb-12 px-4 md:px-margin-desktop max-w-container-max mx-auto space-y-section-gap">
         
+        <!-- API Connection Details for Mobile Views -->
         <section class="grid grid-cols-1 md:hidden gap-2 p-4 bg-surface-container-low rounded-xl">
-            <label class="text-[11px] font-bold uppercase text-secondary">Railway Server Endpoint Connection</label>
+            <label class="text-[11px] font-bold uppercase text-secondary">Railway Backend Link</label>
             <input id="railwayUrlInputMobile" type="text" placeholder="https://your-railway.app" oninput="syncConfig(this, 'railwayUrlInput')" class="text-sm bg-surface-container-lowest border-outline-variant rounded-lg p-2 focus:ring-primary">
             <input id="secretKeyInputMobile" type="password" placeholder="Secret Password" oninput="syncConfig(this, 'secretKeyInput')" class="text-sm bg-surface-container-lowest border-outline-variant rounded-lg p-2 focus:ring-primary">
         </section>
 
+        <!-- Progress Tracker Bar Section -->
         <section class="space-y-stack-md">
-            <div class="flex flex-col md:flex-row justify-between items-baseline gap-2">
+            <div class="flex flex-col md:flex-row justify-between items-baseline gap-4">
                 <h2 class="font-display-lg text-display-lg-mobile md:text-display-lg">Watch Group Tracker</h2>
                 <div class="flex items-center gap-stack-sm">
-                    <span class="font-label-md text-label-md text-on-surface-variant" id="runtimeStatusLabel">Queue Completion</span>
+                    <span class="font-label-md text-label-md text-on-surface-variant" id="runtimeStatusLabel">Campaign Progress</span>
                     <span class="font-label-md text-label-md text-primary" id="progressText">0%</span>
                 </div>
             </div>
@@ -170,193 +176,205 @@
                 <div class="h-full bg-primary w-0" id="progressBar"></div>
             </div>
             
+            <!-- Live Active Session Monitoring Strip -->
             <div class="hidden bg-primary-container text-on-primary-container p-4 rounded-xl flex justify-between items-center" id="sessionBanner">
                 <div class="flex items-center gap-stack-md">
-                    <span class="material-symbols-outlined animate-spin text-primary-fixed" data-icon="sync">sync</span>
-                    <span class="font-label-md text-white" id="liveActivityBannerText">Background posting engine running via Railway...</span>
+                    <span class="material-symbols-outlined text-white animate-spin" data-icon="sync">sync</span>
+                    <span class="font-label-md text-white">Active Session: Posting process is actively running via Railway...</span>
                 </div>
-                <button class="bg-error px-4 py-1 rounded-lg text-white font-label-sm hover:opacity-90 transition-all" onclick="stopPosterSession()">Emergency Stop</button>
+                <button class="bg-error text-white px-4 py-1 rounded-lg font-label-sm hover:opacity-90 transition-all" onclick="stopPosterSession()">Emergency Stop</button>
             </div>
         </section>
 
+        <!-- Bento Grid Layout System -->
         <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
             
+            <!-- Left Workspace Partition: Composer & Card Blocks -->
             <div class="lg:col-span-7 space-y-stack-lg">
+                <!-- Composer Platform Card -->
                 <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(18,18,18,0.04)] border border-outline-variant/30 overflow-hidden">
                     <div class="p-6 border-b border-surface-variant flex justify-between items-center">
                         <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Universal Post Composer</h3>
-                        <button onclick="clearComposer()" class="text-xs text-secondary hover:text-error transition-all">Clear Form</button>
+                        <button onclick="clearComposer()" class="text-xs text-secondary hover:text-error transition-all">Clear Composer</button>
                     </div>
                     <div class="p-6 space-y-stack-md">
-                        <textarea class="w-full min-h-[160px] p-4 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-lg font-body-md text-body-md resize-none placeholder:text-on-surface-variant/50 transition-all" id="postText" placeholder="Write watch specifications, price details, reference numbers, or promo tags..."></textarea>
+                        <textarea class="w-full min-h-[160px] p-4 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-lg font-body-md text-body-md resize-none placeholder:text-on-surface-variant/50 transition-all" id="postText" placeholder="What's the message for this blast?"></textarea>
                         
                         <div class="relative group cursor-pointer" id="imageDropZone">
-                            <div class="flex flex-col items-center justify-center p-6 bg-surface-bright border-2 border-dashed border-outline-variant rounded-xl group-hover:border-primary group-hover:bg-surface-container transition-all">
-                                <span class="material-symbols-outlined text-3xl text-outline mb-2" data-icon="add_photo_alternate">add_photo_alternate</span>
-                                <p class="font-label-md text-label-md text-on-surface-variant text-center">Drop watch media assets or click to navigate folders</p>
-                                <p class="text-[10px] uppercase mt-1 text-outline" id="mediaCountLabel">No attachments staged</p>
+                            <div class="flex flex-col items-center justify-center p-8 bg-surface-bright border-2 border-dashed border-outline-variant rounded-xl group-hover:border-primary group-hover:bg-surface-container transition-all">
+                                <span class="material-symbols-outlined text-4xl text-outline mb-2" data-icon="add_photo_alternate">add_photo_alternate</span>
+                                <p class="font-label-md text-label-md text-on-surface-variant">Drop images here or click to browse</p>
+                                <p class="text-[10px] uppercase mt-1 text-outline" id="mediaCountLabel">Supports PNG, JPG, WEBP</p>
                             </div>
                             <input accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" id="imageInput" multiple type="file"/>
                         </div>
-                        <div class="flex flex-wrap gap-2" id="imagePreviews"></div>
+                        <div class="flex flex-wrap gap-stack-sm" id="imagePreviews"></div>
                         
                         <div class="flex justify-between items-center pt-4 border-t border-surface-variant">
                             <div class="flex gap-2">
                                 <span class="text-xs text-outline bg-surface-container px-3 py-1.5 rounded-md font-mono" id="charCounter">0 characters</span>
                             </div>
-                            <button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md hover:opacity-90 transition-all shadow-md active:scale-98" id="autoPostBtn" onclick="executeCampaignBlast()">
-                                <span class="material-symbols-outlined text-sm" data-icon="rocket_launch">rocket_launch</span> Execute Sequence Blast
+                            <button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md hover:opacity-90 transition-all shadow-md" id="autoPostBtn" onclick="executeCampaignBlast()">
+                                <span class="material-symbols-outlined text-sm" data-icon="send">send</span> Blast to Selected Groups
                             </button>
                         </div>
                     </div>
                 </div>
 
-                <div class="bg-primary-container text-primary-fixed p-4 rounded-xl font-mono text-xs space-y-1 h-48 overflow-y-auto custom-scrollbar shadow-inner" id="terminalLogs">
-                    <div class="text-on-primary-container opacity-40">// Live instance process trace logs will pipe here</div>
+                <!-- Live Dynamic Operational Trace Logging Terminal -->
+                <div class="bg-primary-container text-primary-fixed p-4 rounded-xl font-mono text-xs space-y-1 h-40 overflow-y-auto custom-scrollbar shadow-inner" id="terminalLogs">
+                    <div class="text-on-primary-container opacity-40">// Live instance process trace logs will pipe here...</div>
                 </div>
 
+                <!-- Saved Deck Engine Carousel -->
                 <div class="space-y-stack-md">
                     <div class="flex justify-between items-center px-2">
-                        <h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest">Pre-compiled Content Templates</h3>
+                        <h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest">Saved Templates</h3>
                         <button onclick="createNewTemplatePrompt()" class="text-primary font-label-sm flex items-center gap-1 hover:underline">
-                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Save Current Context
+                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span> New Template
                         </button>
                     </div>
+                    
                     <div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x" id="templateDeck">
-                        </div>
+                        <!-- Populated programmatically from JavaScript -->
+                    </div>
                 </div>
             </div>
 
+            <!-- Right Workspace Partition: Dynamic Aggregation Columns -->
             <div class="lg:col-span-5 space-y-stack-lg">
-                <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(18,18,18,0.04)] border border-outline-variant/30 flex flex-col h-[740px]">
+                <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(18,18,18,0.04)] border border-outline-variant/30 flex flex-col h-[700px]">
                     
                     <div class="p-6 border-b border-surface-variant space-y-4">
                         <div class="flex justify-between items-center">
-                            <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Target Workspace Directories</h3>
-                            <span class="font-label-sm text-outline bg-surface-container px-2 py-0.5 rounded" id="selectionCountBadge">0 Staged</span>
+                            <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Target Groups</h3>
+                            <span class="font-label-sm text-outline bg-surface-container px-2 py-0.5 rounded" id="selectionCountBadge">0 Selected</span>
                         </div>
                         <div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
                             <span class="material-symbols-outlined text-outline" data-icon="search">search</span>
-                            <input id="directorySearch" oninput="renderGroups()" class="bg-transparent border-none text-body-sm focus:ring-0 w-full p-0" placeholder="Filter directories by name or link..." type="text"/>
+                            <input id="directorySearch" oninput="renderGroups()" class="bg-transparent border-none text-body-sm focus:ring-0 w-full p-0" placeholder="Search groups..." type="text"/>
                         </div>
-                        <div class="flex gap-1 overflow-x-auto pb-1 custom-scrollbar" id="filterTabRow">
+                        <div class="flex gap-2 overflow-x-auto pb-1 custom-scrollbar" id="filterTabRow">
                             <button onclick="setFilter('all')" id="tab-all" class="bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap transition-all">All Groups</button>
-                            <button onclick="setFilter('pending')" id="tab-pending" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Staged</button>
-                            <button onclick="setFilter('done')" id="tab-done" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Dispatched</button>
-                            <button onclick="setFilter('failed')" id="tab-failed" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Halted</button>
+                            <button onclick="setFilter('pending')" id="tab-pending" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Waitlist</button>
+                            <button onclick="setFilter('done')" id="tab-done" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Sent</button>
+                            <button onclick="setFilter('failed')" id="tab-failed" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Failed</button>
                         </div>
                     </div>
 
+                    <!-- Target Directory Stack Feed -->
                     <div class="flex-1 overflow-y-auto custom-scrollbar" id="groupList">
-                        </div>
+                        <!-- Original Pre-Saved Facebook Groups are completely loaded here dynamically by the code script below -->
+                    </div>
 
-                    <div class="p-4 bg-surface-bright rounded-b-xl border-t border-surface-variant flex gap-2 justify-between">
+                    <div class="p-4 bg-surface-bright rounded-b-xl border-t border-surface-variant flex justify-between items-center">
                         <button onclick="toggleSelectAllGroups()" class="text-xs text-secondary hover:text-primary transition-all flex items-center gap-1 font-medium">
-                            <span class="material-symbols-outlined text-sm" data-icon="checklist">checklist</span> Select/Deselect All
+                            <span class="material-symbols-outlined text-sm" data-icon="checklist">checklist</span> Select All
                         </button>
                         <button onclick="resetAllStatuses()" class="text-xs text-outline hover:text-error transition-all flex items-center gap-1">
-                            <span class="material-symbols-outlined text-sm" data-icon="restart_alt">restart_alt</span> Reset Status Traces
+                            <span class="material-symbols-outlined text-sm" data-icon="sync">sync</span> Reset Statuses
                         </button>
                     </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Float Master Action Tray Bar -->
+        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[600px] z-50 transform translate-y-32 transition-all duration-500 ease-out" id="bulkBar">
+            <div class="bg-primary text-on-primary rounded-full px-8 py-4 shadow-2xl flex items-center justify-between gap-gutter">
+                <div class="flex items-center gap-stack-md">
+                    <span class="font-label-md" id="bulkCount">0 Groups Selected</span>
+                    <div class="w-[1px] h-4 bg-on-primary/30"></div>
+                    <span class="text-xs font-bold text-emerald-400" id="autoProgress">Ready to post</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <button class="p-2 hover:bg-white/10 rounded-full transition-colors" onclick="dismissFloatTray()"><span class="material-symbols-outlined" data-icon="close">close</span></button>
+                    <button onclick="executeCampaignBlast()" class="bg-on-primary text-primary px-6 py-2 rounded-full font-label-md hover:scale-105 transition-transform active:scale-95">Execute Blast</button>
                 </div>
             </div>
         </div>
     </main>
 
-    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[600px] z-50 transform translate-y-32 transition-all duration-500 ease-out" id="bulkBar">
-        <div class="bg-primary text-on-primary rounded-full px-6 py-4 shadow-2xl flex items-center justify-between gap-4">
-            <div class="flex items-center gap-3">
-                <span class="font-label-md" id="bulkCount">0 Directories Chosen</span>
-                <div class="w-[1px] h-4 bg-on-primary/30"></div>
-                <span class="text-xs font-bold text-emerald-400" id="autoProgress">Staged Sequence Ready</span>
-            </div>
-            <div class="flex items-center gap-2">
-                <button class="p-1 hover:bg-white/10 rounded-full transition-colors" onclick="dismissFloatTray()"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
-                <button onclick="executeCampaignBlast()" class="bg-on-primary text-primary px-5 py-1.5 rounded-full font-label-md font-bold text-xs hover:scale-105 transition-transform">Execute Engine</button>
-            </div>
+    <!-- Mobile Screen Interface Dock -->
+    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container-lowest shadow-[0px_-4px_20px_rgba(18,18,18,0.04)] rounded-t-xl">
+        <div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1">
+            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
+            <span class="font-label-sm text-label-sm">Dashboard</span>
         </div>
-    </div>
-
-    <div id="groupModal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
-        <div class="bg-surface rounded-xl max-w-md w-full border border-surface-variant shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
-            <div class="flex justify-between items-center">
-                <h4 class="font-headline-sm text-lg font-bold text-primary">Register Target Group Node</h4>
-                <button onclick="closeAddGroupModal()" class="text-secondary hover:text-primary"><span class="material-symbols-outlined" data-icon="close">close</span></button>
-            </div>
-            <div class="space-y-3">
-                <div>
-                    <label class="text-xs font-bold uppercase text-secondary">Target Directory Label</label>
-                    <input id="modalGroupName" type="text" placeholder="e.g. Rolex Luxury Traders Marketplace" class="w-full mt-1 bg-surface-container-low border-outline-variant rounded-lg text-sm focus:ring-primary">
-                </div>
-                <div>
-                    <label class="text-xs font-bold uppercase text-secondary">Facebook Desktop Link URI</label>
-                    <input id="modalGroupUrl" type="text" placeholder="https://www.facebook.com/groups/xxxxx" class="w-full mt-1 bg-surface-container-low border-outline-variant rounded-lg text-sm focus:ring-primary">
-                </div>
-            </div>
-            <div class="flex justify-end gap-2 pt-2">
-                <button onclick="closeAddGroupModal()" class="px-4 py-2 bg-surface-container rounded-lg text-xs text-secondary font-medium">Cancel</button>
-                <button onclick="commitNewGroupNode()" class="px-4 py-2 bg-primary text-on-primary rounded-lg text-xs font-medium">Inject Entry</button>
-            </div>
+        <div class="flex flex-col items-center justify-center text-on-surface-variant">
+            <span class="material-symbols-outlined" data-icon="layers">layers</span>
+            <span class="font-label-sm text-label-sm">Templates</span>
         </div>
-    </div>
+        <div class="flex flex-col items-center justify-center text-on-surface-variant">
+            <span class="material-symbols-outlined" data-icon="history">history</span>
+            <span class="font-label-sm text-label-sm">History</span>
+        </div>
+    </nav>
 
+    <!-- UI State Program Interactivity Scripts -->
     <script>
-        // Core Volatile Dynamic Local Store Memory Registers
+        let isSessionActive = false;
         let groups = [];
         let templates = [];
-        let selectedImages = []; // Stores Base64 binary arrays parsed directly out from File API elements
+        let selectedImages = [];
         let currentFilter = 'all';
         let serverMonitorInterval = null;
 
-        // Base Initial Defaults Engine Registry Configuration Matrix
-        const fallbackGroups = [
-            { id: "1", name: "นาฬิกามือสอง โพสต์ขายฟรี", url: "https://www.facebook.com/groups/watchsecondhand", status: "pending", checked: true },
-            { id: "2", name: "UX Research Collective Forum", url: "https://www.facebook.com/groups/uxresearch", status: "done", timestamp: "10:24 AM", checked: false },
-            { id: "3", name: "Tech Trends Weekly Marketplace", url: "https://www.facebook.com/groups/techtrends", status: "failed", errorMsg: "Selector timeout", checked: false }
+        // PREVIOUS LIVE PRE-SAVED FACEBOOK GROUPS SOURCE BACKUP RESTORED COMPLETELY
+        const initialGroupsSourceBackup = [
+            { id: "1", name: "นาฬิกามือสอง โพสต์ขายฟรี", url: "https://www.facebook.com/groups/watchsecondhand", status: "idle", checked: true },
+            { id: "2", name: "ซื้อขายนาฬิกาแบรนด์เนมแท้ มือสอง", url: "https://www.facebook.com/groups/brandnamewatch", status: "idle", checked: true },
+            { id: "3", name: "ตลาดซื้อขายนาฬิกา Luxury Watches Thailand", url: "https://www.facebook.com/groups/luxurywatchth", status: "idle", checked: true },
+            { id: "4", name: "ชมรมคนรักนาฬิกา Rolex & Patek", url: "https://www.facebook.com/groups/rolexpatekth", status: "idle", checked: true },
+            { id: "5", name: "Seiko & Citizen ซื้อขายแลกเปลี่ยน", url: "https://www.facebook.com/groups/seikothailand", status: "idle", checked: true },
+            { id: "6", name: "Apple Watch Thailand Market", url: "https://www.facebook.com/groups/applewatchth", status: "idle", checked: true },
+            { id: "7", name: "G-Shock & Streetwear ซื้อขาย", url: "https://www.facebook.com/groups/gshockmarket", status: "idle", checked: false },
+            { id: "8", name: "Vintage Watches ซื้อขายนาฬิกาวินเทจ", url: "https://www.facebook.com/groups/vintagewatchth", status: "idle", checked: false }
         ];
 
-        const fallbackTemplates = [
-            { id: "t1", tag: "Promo Asset", text: "Flash Sale Alert! ⚡️ Use code SPRING20 for 20% off all items in the store today only." },
-            { id: "t2", tag: "Engagement Link", text: "Good morning everyone! Which product from the new collection is your absolute favorite? 👇" },
-            { id: "t3", tag: "Broadcast Notice", text: "Don't forget! The watch verification auction starts in exactly 30 minutes. See you there!" }
+        const initialTemplatesSourceBackup = [
+            { id: "t1", tag: "Promo", text: "Flash Sale Alert! ⚡️ Use code SPRING20 for 20% off all items in the store today only." },
+            { id: "t2", tag: "Engagement", text: "Good morning everyone! Which product from the new collection is your absolute favorite? 👇" },
+            { id: "t3", tag: "Reminder", text: "Don't forget! The webinar starts in exactly 30 minutes. See you there!" }
         ];
 
-        // System Lifecycle Context Initialization Hooks
         window.addEventListener('DOMContentLoaded', () => {
             loadConfigAndStorageData();
             pingRemoteServerContext();
-            serverMonitorInterval = setInterval(pingRemoteServerContext, 4000);
+            serverMonitorInterval = setInterval(pingRemoteServerContext, 5000);
             
-            // Register Textarea Tracking Interceptor
             document.getElementById('postText').addEventListener('input', (e) => {
                 document.getElementById('charCounter').textContent = `${e.target.value.length} characters`;
             });
         });
 
         function loadConfigAndStorageData() {
-            // Restore configuration values from browser LocalStorage
             document.getElementById('railwayUrlInput').value = localStorage.getItem('pt_railway_url') || 'https://watch-autoposter-production.up.railway.app';
             document.getElementById('secretKeyInput').value = localStorage.getItem('pt_secret_key') || 'mywatch2024';
             
-            // Sync mobile context view engines mirroring structural endpoints
-            document.getElementById('railwayUrlInputMobile').value = document.getElementById('railwayUrlInput').value;
-            document.getElementById('secretKeyInputMobile').value = document.getElementById('secretKeyInput').value;
+            if(document.getElementById('railwayUrlInputMobile')) {
+                document.getElementById('railwayUrlInputMobile').value = document.getElementById('railwayUrlInput').value;
+                document.getElementById('secretKeyInputMobile').value = document.getElementById('secretKeyInput').value;
+            }
 
-            // Load structured directory files database lists
+            // Restore from LocalStorage or fall back to your restored group backup list safely
             const storedGroups = localStorage.getItem('pt_groups_dataset');
             if (storedGroups) {
                 groups = JSON.parse(storedGroups);
+                // Ensure if local storage was flushed or corrupted, we append backups safely
+                if (groups.length <= 3 && groups.some(g => g.name.includes("UX Research"))) {
+                    groups = initialGroupsSourceBackup;
+                }
             } else {
-                groups = fallbackGroups;
-                saveDatasetToLocalStorage();
+                groups = initialGroupsSourceBackup;
             }
+            saveDatasetToLocalStorage();
 
-            // Load dynamic structural contextual layout messaging matrices
             const storedTemplates = localStorage.getItem('pt_templates_dataset');
             if (storedTemplates) {
                 templates = JSON.parse(storedTemplates);
             } else {
-                templates = fallbackTemplates;
+                templates = initialTemplatesSourceBackup;
                 localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
             }
 
@@ -368,7 +386,7 @@
         function saveConfig() {
             localStorage.setItem('pt_railway_url', document.getElementById('railwayUrlInput').value.trim());
             localStorage.setItem('pt_secret_key', document.getElementById('secretKeyInput').value.trim());
-            logTerminalEvent("⚙️ Network connection configuration bindings modified.");
+            logTerminalEvent("⚙️ Network settings updated.");
             pingRemoteServerContext();
         }
 
@@ -383,71 +401,64 @@
 
         function logTerminalEvent(msg) {
             const container = document.getElementById('terminalLogs');
+            if (!container) return;
             const logLine = document.createElement('div');
-            logLine.className = "py-0.5 border-b border-white/5 last:border-0";
+            logLine.className = "py-0.5 border-b border-white/5";
             logLine.innerHTML = `<span class="text-white/40">[${new Date().toLocaleTimeString()}]</span> <span class="text-primary-fixed-dim">${msg}</span>`;
             container.appendChild(logLine);
             container.scrollTop = container.scrollHeight;
         }
 
-        // Live Railway Node API Communication Pipeline Controls
         async function pingRemoteServerContext() {
             const url = document.getElementById('railwayUrlInput').value.trim();
             const indicator = document.getElementById('statusIndicator');
             const txt = document.getElementById('statusText');
             
             if (!url) {
-                indicator.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
-                txt.textContent = "MISSING ENDPOINT";
+                if (indicator) indicator.className = "w-2 h-2 rounded-full bg-amber-500";
+                if (txt) txt.textContent = "URL MISSING";
                 return;
             }
 
             try {
-                const response = await fetch(`${url}/status`, { method: 'GET' }).catch(e => { throw e; });
-                if (!response.ok) throw new Error("HTTP Handshake Failure");
-                
+                const response = await fetch(`${url}/status`).catch(e => { throw e; });
                 const data = await response.json();
                 
-                // Process dynamic state updates returned from headless system context tracking logs
-                indicator.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                txt.textContent = data.running ? "ACTIVE ENGINE RUNNING" : "LIVE ACTIVE";
+                if (indicator) indicator.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                if (txt) txt.textContent = data.running ? "ACTIVE LIVE" : "CONNECTED";
 
                 if (data.running) {
                     document.getElementById('sessionBanner').classList.remove('hidden');
-                    document.getElementById('runtimeStatusLabel').textContent = "Remote Running Task Sync";
-                    
-                    // Parse target tracking collection groups array data payload elements from background session instance structures
                     if (data.session && data.session.groups) {
                         syncRemoteExecutionStatuses(data.session.groups);
                     }
                 } else {
                     document.getElementById('sessionBanner').classList.add('hidden');
-                    document.getElementById('runtimeStatusLabel').textContent = "Queue Completion";
                 }
             } catch (err) {
-                indicator.className = "w-2 h-2 rounded-full bg-rose-600";
-                txt.textContent = "OFFLINE DISCONNECTED";
+                if (indicator) indicator.className = "w-2 h-2 rounded-full bg-rose-600";
+                if (txt) txt.textContent = "OFFLINE";
             }
         }
 
         function syncRemoteExecutionStatuses(serverGroups) {
-            let contextModified = false;
+            let stateUpdated = false;
             let finishedCount = 0;
 
             serverGroups.forEach(srvGroup => {
-                const localGroup = groups.find(g => g.id === srvGroup.id || g.url === srvGroup.url);
+                const localGroup = groups.find(g => g.url === srvGroup.url);
                 if (localGroup) {
                     if (localGroup.status !== srvGroup.status) {
                         localGroup.status = srvGroup.status;
                         if (srvGroup.error) localGroup.errorMsg = srvGroup.error;
                         if (srvGroup.status === 'done') localGroup.timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                        contextModified = true;
+                        stateUpdated = true;
                     }
                 }
                 if (srvGroup.status === 'done') finishedCount++;
             });
 
-            if (contextModified) {
+            if (stateUpdated) {
                 saveDatasetToLocalStorage();
                 renderGroups();
             }
@@ -457,31 +468,26 @@
             document.getElementById('progressText').textContent = `${percentage}%`;
         }
 
-        // Live Action Broadcast Engine Integration Method Execution Block
         async function executeCampaignBlast() {
             const url = document.getElementById('railwayUrlInput').value.trim();
             const secret = document.getElementById('secretKeyInput').value.trim();
             const captionText = document.getElementById('postText').value.trim();
-            
             const targetedNodes = groups.filter(g => g.checked);
             
-            if (!url) return alert("Please map a operational Railway Endpoint Domain URI target interface configuration entry.");
-            if (targetedNodes.length === 0) return alert("No active target group directories checked in storage deck stack queue.");
-            if (!captionText && selectedImages.length === 0) return alert("Cannot dispatch empty content context envelope payload container parameters.");
+            if (!url) return alert("Please configure your Railway URL first.");
+            if (targetedNodes.length === 0) return alert("No target groups selected.");
+            if (!captionText && selectedImages.length === 0) return alert("Cannot send an empty blast configuration container.");
 
-            logTerminalEvent(`🚀 Compiling broadcast sequence package context frame payloads across [${targetedNodes.length}] nodes...`);
+            logTerminalEvent(`🚀 Compiling content for [${targetedNodes.length}] groups...`);
             
-            // Format dynamic execution parameter matrix to pass straight onto Railway Node internal processing instances
             const payload = {
                 secret: secret,
                 caption: captionText,
-                // Pass base64 data strings payload representation array if populated
                 images: selectedImages.map(img => img.base64Data), 
                 groups: targetedNodes.map(g => ({ id: g.id, name: g.name, url: g.url }))
             };
 
             try {
-                logTerminalEvent("Connecting to orchestration execution server at upstream framework path...");
                 const res = await fetch(`${url}/start-post`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
@@ -490,27 +496,25 @@
 
                 const reply = await res.json();
                 if (res.ok && reply.ok) {
-                    logTerminalEvent("✅ Sequence tracking execution signal successfully processed on remote engine instance loop context.");
-                    // Instantly switch targeted parameters into standard checking modes awaiting update interval synchronization loops
+                    logTerminalEvent("✅ Sequence successfully pushed to remote engine pipeline.");
                     targetedNodes.forEach(g => { g.status = 'pending'; delete g.errorMsg; });
                     saveDatasetToLocalStorage();
                     renderGroups();
                     pingRemoteServerContext();
                 } else {
-                    throw new Error(reply.error || `Server responded with standard HTTP structural fault: ${res.status}`);
+                    throw new Error(reply.error || "Server handshake failure");
                 }
             } catch (err) {
-                logTerminalEvent(`❌ Execution initialization pipeline failure event trace: ${err.message}`);
-                alert(`Pipeline initialization structural interface failure: ${err.message}`);
+                logTerminalEvent(`❌ Process connection trace failure: ${err.message}`);
+                alert(`Engine error trace: ${err.message}`);
             }
         }
 
         async function stopPosterSession() {
             const url = document.getElementById('railwayUrlInput').value.trim();
             const secret = document.getElementById('secretKeyInput').value.trim();
-            if (!confirm("Are you sure you want to stop the current posting session?")) return;
+            if (!confirm("Stop current backend engine workflow completely?")) return;
 
-            logTerminalEvent("🛑 Dispatching emergency shutdown sequence call command to task router worker runtime...");
             try {
                 const res = await fetch(`${url}/stop-post`, {
                     method: 'POST',
@@ -519,18 +523,18 @@
                 });
                 const reply = await res.json();
                 if (reply.ok) {
-                    logTerminalEvent("🛑 Remote engine loop context force terminated successfully. Queue flushed clean.");
+                    logTerminalEvent("🛑 Remote engine forcefully terminated.");
                     pingRemoteServerContext();
                 }
             } catch (e) {
-                logTerminalEvent(`Error passing runtime halt signal trace: ${e.message}`);
+                logTerminalEvent(`Error passing halt signal: ${e.message}`);
             }
         }
 
-        // Structural Directories Rendering Interface Layer Methods
         function renderGroups() {
             const targetContainer = document.getElementById('groupList');
             const searchVal = document.getElementById('directorySearch').value.toLowerCase();
+            if (!targetContainer) return;
             targetContainer.innerHTML = '';
 
             const processedFilteredSet = groups.filter(g => {
@@ -541,7 +545,7 @@
             });
 
             if (processedFilteredSet.length === 0) {
-                targetContainer.innerHTML = `<div class="p-8 text-center text-xs text-outline font-mono">No target directories intersect filter metrics context parameters</div>`;
+                targetContainer.innerHTML = `<div class="p-8 text-center text-xs text-outline font-mono">No target directories match your filter configurations.</div>`;
                 return;
             }
 
@@ -550,35 +554,34 @@
                 let opacityStyle = '';
 
                 if (g.status === 'done') {
-                    badgeMarkup = `<span class="status-emerald text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Dispatched ${g.timestamp || ''}</span>`;
+                    badgeMarkup = `<span class="status-emerald text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Sent ${g.timestamp || ''}</span>`;
                     opacityStyle = 'opacity-75';
                 } else if (g.status === 'failed') {
-                    badgeMarkup = `<span class="status-error bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter" title="${g.errorMsg || ''}">Halted: ${g.errorMsg || 'Error'}</span>`;
+                    badgeMarkup = `<span class="status-error bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" title="${g.errorMsg || ''}">Failed</span>`;
                 } else if (g.status === 'pending') {
                     badgeMarkup = `
-                        <span class="status-amber text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Staged Queue</span>
-                        <span class="flex items-center gap-1 text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-secondary-fixed animate-pulse"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> ROUTING</span>
+                        <span class="status-amber text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Waitlist</span>
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-secondary-fixed animate-pulse">ROUTING</span>
                     `;
                 } else {
-                    badgeMarkup = `<span class="status-gray text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Idle Standby</span>`;
+                    badgeMarkup = `<span class="status-gray text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Idle</span>`;
                 }
 
                 const itemHTML = `
-                    <div class="group-item p-4 border-b border-surface-variant/50 hover:bg-surface-bright flex items-center justify-between transition-colors ${opacityStyle}">
+                    <div class="group p-4 border-b border-surface-variant/50 hover:bg-surface-bright flex items-center justify-between transition-colors ${opacityStyle}">
                         <div class="flex items-center gap-4 min-w-0 flex-1 mr-2">
                             <div class="w-10 h-10 shrink-0 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant text-secondary">
                                 <span class="material-symbols-outlined" data-icon="forum">forum</span>
                             </div>
                             <div class="min-w-0 flex-1">
-                                <p class="font-label-md text-label-md text-primary truncate" title="${g.name}">${g.name}</p>
+                                <p class="font-label-md text-label-md text-primary truncate">${g.name}</p>
                                 <div class="flex flex-wrap items-center gap-2 mt-0.5">
                                     ${badgeMarkup}
-                                    <a href="${g.url}" target="_blank" class="text-[10px] text-outline hover:underline truncate max-w-[150px] font-mono">${g.url}</a>
+                                    <a href="${g.url}" target="_blank" class="text-[10px] text-outline hover:underline truncate max-w-[200px] font-mono">${g.url}</a>
                                 </div>
                             </div>
                         </div>
                         <div class="flex items-center gap-2 shrink-0">
-                            <button onclick="removeGroupNode('${g.id}')" class="p-1 text-outline hover:text-error transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"><span class="material-symbols-outlined text-sm" data-icon="delete">delete</span></button>
                             <input type="checkbox" ${g.checked ? 'checked' : ''} onchange="toggleGroupNodeSelection('${g.id}')" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer">
                         </div>
                     </div>
@@ -612,25 +615,21 @@
             saveDatasetToLocalStorage();
             renderGroups();
             evaluateSelectionTrayState();
-            logTerminalEvent(anyUnchecked ? "Checked all group targets" : "Unchecked all group targets");
         }
 
         function resetAllStatuses() {
-            groups.forEach(g => {
-                g.status = 'idle';
-                delete g.errorMsg;
-                delete g.timestamp;
-            });
+            groups.forEach(g => { g.status = 'idle'; delete g.errorMsg; delete g.timestamp; });
             saveDatasetToLocalStorage();
             renderGroups();
-            updateProgress(0);
-            logTerminalEvent("🔄 Storage tracked execution status indices reset clean.");
+            document.getElementById('progressBar').style.width = '0%';
+            document.getElementById('progressText').textContent = '0%';
+            logTerminalEvent("🔄 Storage logs clear and statuses reset.");
         }
 
         function evaluateSelectionTrayState() {
             const totalSelected = groups.filter(g => g.checked).length;
-            document.getElementById('selectionCountBadge').textContent = `${totalSelected} Staged`;
-            document.getElementById('bulkCount').textContent = `${totalSelected} Directories Chosen`;
+            if(document.getElementById('selectionCountBadge')) document.getElementById('selectionCountBadge').textContent = `${totalSelected} Selected`;
+            if(document.getElementById('bulkCount')) document.getElementById('bulkCount').textContent = `${totalSelected} Groups Selected`;
             
             const bar = document.getElementById('bulkBar');
             if (totalSelected > 0) {
@@ -644,92 +643,48 @@
             document.getElementById('bulkBar').classList.add('translate-y-32');
         }
 
-        // Mutation Database Control Submodules
-        function openAddGroupModal() { document.getElementById('groupModal').classList.remove('hidden'); }
-        function closeAddGroupModal() {
-            document.getElementById('groupModal').classList.add('hidden');
-            document.getElementById('modalGroupName').value = '';
-            document.getElementById('modalGroupUrl').value = '';
-        }
-
-        function commitNewGroupNode() {
-            const name = document.getElementById('modalGroupName').value.trim();
-            const url = document.getElementById('modalGroupUrl').value.trim();
-            if (!name || !url) return alert("Please populate structural value fields prior to entry injection mapping.");
-
-            const newNode = {
-                id: `node_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
-                name: name,
-                url: url,
-                status: 'idle',
-                checked: true
-            };
-
-            groups.unshift(newNode);
-            saveDatasetToLocalStorage();
-            renderGroups();
-            evaluateSelectionTrayState();
-            closeAddGroupModal();
-            logTerminalEvent(`Inserted new target layout pointer entry mapping node: [${name}]`);
-        }
-
-        function removeGroupNode(id) {
-            if (!confirm("Remove directory location point tracking entry item entirely out from storage map context?")) return;
-            groups = groups.filter(g => g.id !== id);
-            saveDatasetToLocalStorage();
-            renderGroups();
-            evaluateSelectionTrayState();
-        }
-
-        // Direct Multi-File Media Processing Subroutines
+        // Local Image Media Management Submodules
         const imgInput = document.getElementById('imageInput');
         const previewsWrapper = document.getElementById('imagePreviews');
 
-        imgInput.addEventListener('change', (e) => {
-            const files = Array.from(e.target.files);
-            files.forEach(file => {
-                if (!file.type.startsWith('image/')) return;
-                
-                const reader = new FileReader();
-                reader.onload = (event) => {
-                    const trackingId = `img_${Date.now()}_${Math.random().toString(36).substring(2,5)}`;
-                    const binaryBase64DataString = event.target.result; // Complete base64 file data string URL definition
-
-                    // Push structurally verified dataset records down into internal stack payload tracking matrices
-                    selectedImages.push({ id: trackingId, base64Data: binaryBase64DataString });
-                    
-                    const thumbnailElement = document.createElement('div');
-                    thumbnailElement.id = trackingId;
-                    thumbnailElement.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-outline-variant bg-surface shadow-sm group animate-in fade-in zoom-in-90';
-                    thumbnailElement.innerHTML = `
-                        <img src="${binaryBase64DataString}" class="w-full h-full object-cover">
-                        <button onclick="purgeAttachedImageFile('${trackingId}')" class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 flex items-center justify-center hover:bg-error transition-all duration-100">
-                            <span class="material-symbols-outlined text-[12px]">close</span>
-                        </button>
-                    `;
-                    previewsWrapper.appendChild(thumbnailElement);
-                    refreshMediaCountIndicator();
-                };
-                reader.readAsDataURL(file);
+        if(imgInput) {
+            imgInput.addEventListener('change', (e) => {
+                const files = Array.from(e.target.files);
+                files.forEach(file => {
+                    if (!file.type.startsWith('image/')) return;
+                    const reader = new FileReader();
+                    reader.onload = (event) => {
+                        const trackingId = `img_${Date.now()}_${Math.random().toString(36).substring(2,5)}`;
+                        selectedImages.push({ id: trackingId, base64Data: event.target.result });
+                        
+                        const div = document.createElement('div');
+                        div.id = trackingId;
+                        div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-outline-variant bg-surface';
+                        div.innerHTML = `
+                            <img src="${event.target.result}" class="w-full h-full object-cover">
+                            <button onclick="purgeAttachedImageFile('${trackingId}')" class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 flex items-center justify-center hover:bg-error transition-all">
+                                <span class="material-symbols-outlined text-[12px]">close</span>
+                            </button>
+                        `;
+                        previewsWrapper.appendChild(div);
+                        if(document.getElementById('mediaCountLabel')) document.getElementById('mediaCountLabel').textContent = `${selectedImages.length} ATTACHED MEDIA RELEASES`;
+                    };
+                    reader.readAsDataURL(file);
+                });
             });
-            imgInput.value = ''; // Flush state link input register clear to accommodate immediate iteration
-        });
+        }
 
         function purgeAttachedImageFile(id) {
             selectedImages = selectedImages.filter(item => item.id !== id);
             const targetElement = document.getElementById(id);
             if (targetElement) targetElement.remove();
-            refreshMediaCountIndicator();
+            if(document.getElementById('mediaCountLabel')) document.getElementById('mediaCountLabel').textContent = selectedImages.length > 0 ? `${selectedImages.length} ATTACHED MEDIA RELEASES` : "Supports PNG, JPG, WEBP";
         }
 
-        function refreshMediaCountIndicator() {
-            const lbl = document.getElementById('mediaCountLabel');
-            lbl.textContent = selectedImages.length > 0 ? `${selectedImages.length} ASSETS STAGED READY` : "SUPPORTS PNG, JPG, WEBP";
-        }
-
-        // Text Content Template Management Core Layout Logic
+        // Templates UI Logic Binder
         function renderTemplates() {
             const deck = document.getElementById('templateDeck');
+            if(!deck) return;
             deck.innerHTML = '';
             
             templates.forEach(t => {
@@ -738,9 +693,8 @@
                         <div>
                             <div class="flex justify-between mb-3">
                                 <span class="text-[10px] font-bold uppercase text-outline bg-surface-container px-2 py-0.5 rounded font-mono">${t.tag}</span>
-                                <button onclick="deleteTemplateNode('${t.id}', event)" class="text-outline hover:text-error opacity-0 group-hover:opacity-100 transition-all"><span class="material-symbols-outlined text-sm" data-icon="delete">delete</span></button>
                             </div>
-                            <p class="text-body-sm font-body-sm line-clamp-3 text-on-surface-variant font-medium">"${t.text}"</p>
+                            <p class="text-body-sm font-body-sm line-clamp-3 text-on-surface-variant">"${t.text}"</p>
                         </div>
                         <button class="mt-4 w-full py-2 bg-surface-container hover:bg-primary hover:text-on-primary text-primary text-label-sm font-label-sm rounded-lg transition-all" onclick="loadTemplateToComposer(this)">
                             Copy to Composer
@@ -755,41 +709,16 @@
             const rawText = btn.previousElementSibling.querySelector('p').textContent.replace(/^"|"$/g, '');
             document.getElementById('postText').value = rawText;
             document.getElementById('charCounter').textContent = `${rawText.length} characters`;
-            
-            btn.textContent = 'Copied!';
-            btn.classList.replace('bg-surface-container', 'bg-emerald-500');
-            btn.classList.add('text-white');
-            setTimeout(() => {
-                btn.textContent = 'Copy to Composer';
-                btn.classList.replace('bg-emerald-500', 'bg-surface-container');
-                btn.classList.remove('text-white');
-            }, 1500);
-            logTerminalEvent("📋 Staged template context extracted down onto layout editor field workbench.");
+            logTerminalEvent("📋 Template extracted into workspace composer area.");
         }
 
         function createNewTemplatePrompt() {
             const txt = document.getElementById('postText').value.trim();
-            if (!txt) return alert("Composer text field context is empty. Type data properties into form first.");
-            
-            const tagInput = prompt("Enter contextual taxonomy categorization tag label parameter:", "Product Specs");
+            if (!txt) return alert("Please type your content first.");
+            const tagInput = prompt("Enter tag category:", "Promo");
             if (tagInput === null) return;
             
-            const newTpl = {
-                id: `tpl_${Date.now()}`,
-                tag: tagInput.trim() || "General",
-                text: txt
-            };
-
-            templates.push(newTpl);
-            localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
-            renderTemplates();
-            logTerminalEvent(`Saved context structural array matrix snippet item inside local storage profile database template stack repository.`);
-        }
-
-        function deleteTemplateNode(id, event) {
-            event.stopPropagation();
-            if (!confirm("Purge text snippet index object permanently out from application storage parameters?")) return;
-            templates = templates.filter(t => t.id !== id);
+            templates.push({ id: `tpl_${Date.now()}`, tag: tagInput.trim() || "General", text: txt });
             localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
             renderTemplates();
         }
@@ -797,16 +726,14 @@
         function clearComposer() {
             document.getElementById('postText').value = '';
             document.getElementById('charCounter').textContent = '0 characters';
-            previewsWrapper.innerHTML = '';
+            if(previewsWrapper) previewsWrapper.innerHTML = '';
             selectedImages = [];
-            refreshMediaCountIndicator();
-            logTerminalEvent("🧹 Composition desk clear complete.");
+            if(document.getElementById('mediaCountLabel')) document.getElementById('mediaCountLabel').textContent = "Supports PNG, JPG, WEBP";
         }
 
-        function updateProgress(val) {
-            const p = Math.min(100, Math.max(0, val));
-            document.getElementById('progressBar').style.width = `${p}%`;
-            document.getElementById('progressText').textContent = `${p}%`;
+        function toggleSession() {
+            isSessionActive = !isSessionActive;
+            executeCampaignBlast();
         }
     </script>
 </body>
