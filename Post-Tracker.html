@@ -155,14 +155,32 @@
     border: 1.5px solid var(--border);
   }
 
+  .card-label-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+  }
+
   .card-label {
     font-size: 11px;
     font-weight: 600;
     color: var(--text-dim);
     letter-spacing: 0.5px;
     text-transform: uppercase;
-    margin-bottom: 12px;
   }
+
+  .clear-section-btn {
+    background: transparent;
+    border: none;
+    color: #c05050;
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    text-transform: uppercase;
+    letter-spacing: 0.3px;
+  }
+  .clear-section-btn:active { opacity: 0.6; }
 
   .post-textarea {
     width: 100%;
@@ -740,7 +758,10 @@
 
 <div class="content">
   <div class="post-card">
-    <div class="card-label">Caption</div>
+    <div class="card-label-row">
+      <div class="card-label">Caption</div>
+      <button class="clear-section-btn" onclick="clearCaption()">Clear</button>
+    </div>
     <textarea class="post-textarea" id="postText" placeholder="วางข้อความที่จะโพสต์ที่นี่..."></textarea>
     <button class="copy-btn" id="copyBtn" onclick="copyText()">Copy Caption</button>
   </div>
@@ -753,7 +774,7 @@
     <div style="margin-bottom:12px;">
       <div style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:6px;">PC SERVER URL (ngrok)</div>
       <div style="display:flex;gap:8px;align-items:center;">
-        <input id="serverUrl" type="url" placeholder="https://your-app.up.railway.app"
+        <input id="serverUrl" type="url" placeholder="https://xxxx.ngrok-free.app"
           style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;"
           oninput="saveServerUrl()" />
         <button onclick="checkServer()" id="pingBtn"
@@ -766,12 +787,15 @@
 
     <!-- Image upload -->
     <div style="margin-bottom:12px;">
-      <div style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:6px;">IMAGES</div>
+      <div class="card-label-row">
+        <div style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;">IMAGES</div>
+        <button class="clear-section-btn" onclick="clearImages()">Clear Images</button>
+      </div>
       <div id="imageDropZone" onclick="document.getElementById('imageInput').click()"
         style="border:1.5px dashed var(--border);border-radius:var(--r-sm);padding:16px;text-align:center;cursor:pointer;background:var(--bg);transition:border-color 0.2s;">
         <div style="font-size:24px;margin-bottom:4px;">📷</div>
         <div style="font-size:13px;font-weight:500;color:var(--text-mid);">Tap to select images</div>
-        <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">JPG, PNG up to 20MB each</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">Auto-Compressed for Mobile Speed</div>
       </div>
       <input type="file" id="imageInput" accept="image/*" multiple style="display:none;" onchange="handleImages(event)" />
       <div id="imagePreviews" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
@@ -780,7 +804,7 @@
     <!-- Auto-post button -->
     <button id="autoPostBtn" onclick="startAutoPost()"
       style="width:100%;background:var(--text);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:14px 20px;border-radius:var(--r-sm);cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;">
-      🚀 Auto-Post Selected Group Only
+      🚀 Start Auto-Post
     </button>
 
     <!-- Stop button (hidden by default) -->
@@ -804,17 +828,27 @@
     <div class="templates-label">Templates</div>
     <div class="templates-scroll">
       <div class="template-card">
-        <div class="template-card-label">📌 Header</div>
+        <div class="template-card-label"></div>
+        <div class="card-label-row" style="margin-bottom: 2px;">
+          <span class="template-card-label">📌 Header</span>
+          <span class="clear-section-btn" style="font-size:10px;" onclick="clearTemplate('headerText')">Clear</span>
+        </div>
         <textarea class="template-textarea" id="headerText" placeholder="หัวข้อโพสต์..." oninput="saveTpl()"></textarea>
         <button class="template-copy-btn" onclick="copyTpl('headerText', this)">Copy Header</button>
       </div>
       <div class="template-card">
-        <div class="template-card-label">💬 Group Chat</div>
+        <div class="card-label-row" style="margin-bottom: 2px;">
+          <span class="template-card-label">💬 Group Chat</span>
+          <span class="clear-section-btn" style="font-size:10px;" onclick="clearTemplate('groupChatText')">Clear</span>
+        </div>
         <textarea class="template-textarea" id="groupChatText" placeholder="ข้อความกลุ่มแชท..." oninput="saveTpl()"></textarea>
         <button class="template-copy-btn" onclick="copyTpl('groupChatText', this)">Copy Group Chat</button>
       </div>
       <div class="template-card">
-        <div class="template-card-label">🔗 Line @</div>
+        <div class="card-label-row" style="margin-bottom: 2px;">
+          <span class="template-card-label">🔗 Line @</span>
+          <span class="clear-section-btn" style="font-size:10px;" onclick="clearTemplate('lineText')">Clear</span>
+        </div>
         <textarea class="template-textarea" id="lineText" placeholder="ข้อความ Line @..." oninput="saveTpl()"></textarea>
         <button class="template-copy-btn" onclick="copyTpl('lineText', this)">Copy Line @</button>
       </div>
@@ -892,6 +926,7 @@ let currentFilter = 'all';
 let sessionMode = false;
 let multiSelectMode = false;
 let selectedIds = new Set();
+let selectedImages = [];
 
 // ─── DATA ───
 function loadData() {
@@ -918,6 +953,27 @@ function saveData() {
   localStorage.setItem('postText', document.getElementById('postText').value);
 }
 
+// ─── SECTION CLEAR BUTTONS ───
+function clearCaption() {
+  document.getElementById('postText').value = '';
+  saveData();
+  showToast('Caption cleared');
+}
+
+function clearImages() {
+  selectedImages = [];
+  document.getElementById('imageInput').value = '';
+  document.getElementById('imagePreviews').innerHTML = '';
+  document.getElementById('imageDropZone').style.display = 'block';
+  showToast('Images cleared');
+}
+
+function clearTemplate(id) {
+  document.getElementById(id).value = '';
+  saveTpl();
+  showToast('Template cleared');
+}
+
 // ─── FILTER ───
 function setFilter(f) {
   currentFilter = f;
@@ -927,8 +983,7 @@ function setFilter(f) {
   render();
 }
 
-// ─── 1. ONE-TAP POST & MARK ───
-// Clicking the main row area OR tapping "เปิดกลุ่ม ↗" opens the link + sets status to Waiting automatically
+// ─── ONE-TAP POST & MARK ───
 function launchLink(id) {
   const g = groups.find(x => x.id === id);
   if (!g) return;
@@ -939,7 +994,6 @@ function launchLink(id) {
   } else {
     showToast('Opening group ↗');
   }
-  // Auto-set to Waiting (you went to post, now waiting for approval)
   if (g.status === 'pending') {
     g.status = 'waiting';
   }
@@ -953,7 +1007,6 @@ function handleGroupMainClick(id) {
     toggleSelect(id);
     return;
   }
-  // Normal toggle pending ↔ done
   const g = groups.find(x => x.id === id);
   if (!g) return;
   g.status = (g.status === 'done') ? 'pending' : 'done';
@@ -969,11 +1022,10 @@ function setStatus(id, status) {
   if (g.status === 'done') showToast('Posted ✓');
   else if (g.status === 'waiting') showToast('Waiting for Approval');
   else showToast('Reset to Pending');
-  // Advance session highlight to next pending
   if (sessionMode) scrollToNextPending();
 }
 
-// ─── 2. MULTI-SELECT BULK ACTIONS ───
+// ─── MULTI-SELECT BULK ACTIONS ───
 function toggleMultiSelect() {
   multiSelectMode = !multiSelectMode;
   selectedIds.clear();
@@ -1024,7 +1076,7 @@ function updateBulkCount() {
     selectedIds.size === 0 ? 'Tap groups to select' : `${selectedIds.size} selected`;
 }
 
-// ─── 3. SESSION MODE ───
+// ─── SESSION MODE ───
 function toggleSession() {
   sessionMode = !sessionMode;
   const btn = document.getElementById('sessionBtn');
@@ -1088,11 +1140,8 @@ function render() {
   const nextPendingId = sessionMode ? (getNextPending()?.id ?? null) : null;
   const visible = getVisible();
 
-  if (multiSelectMode) {
-    list.classList.add('ms-mode');
-  } else {
-    list.classList.remove('ms-mode');
-  }
+  if (multiSelectMode) list.classList.add('ms-mode');
+  else list.classList.remove('ms-mode');
 
   if (visible.length === 0) {
     const labels = { all: 'No groups yet', done: 'None approved yet', waiting: 'None waiting' };
@@ -1237,8 +1286,7 @@ function showToast(msg) {
   toastTimer = setTimeout(() => t.classList.remove('show'), 2000);
 }
 
-// ─── AUTO-POSTER ───
-let selectedImages = [];
+// ─── AUTO-POSTER + MOBILE BLISTERING COMPRESSION ───
 let autoPostInterval = null;
 
 function saveServerUrl() {
@@ -1274,8 +1322,63 @@ async function checkServer() {
   btn.textContent = 'Ping';
 }
 
-function handleImages(e) {
-  selectedImages = Array.from(e.target.files);
+// Mobile Compressor: Downscales images on phone canvas before shipping out over network
+function compressImage(file) {
+  return new Promise((resolve) => {
+    const reader = new FileReader();
+    reader.readAsDataURL(file);
+    reader.onload = (event) => {
+      const img = new Image();
+      img.src = event.target.result;
+      img.onload = () => {
+        const canvas = document.createElement('canvas');
+        let width = img.width;
+        let height = img.height;
+        
+        // Cap max resolution at 1600px width/height while maintaining aspect ratios
+        const MAX_SIZE = 1600;
+        if (width > height && width > MAX_SIZE) {
+          height *= MAX_SIZE / width;
+          width = MAX_SIZE;
+        } else if (height > MAX_SIZE) {
+          width *= MAX_SIZE / height;
+          height = MAX_SIZE;
+        }
+        
+        canvas.width = width;
+        canvas.height = height;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, width, height);
+        
+        // Convert canvas output to blob file optimized to 85% JPEG quality standard
+        canvas.toBlob((blob) => {
+          const compressedFile = new File([blob], file.name, {
+            type: 'image/jpeg',
+            lastModified: Date.now()
+          });
+          resolve(compressedFile);
+        }, 'image/jpeg', 0.85);
+      };
+    };
+  });
+}
+
+async function handleImages(e) {
+  const files = Array.from(e.target.files);
+  if (!files.length) return;
+  
+  showToast('⚡ Optimizing watch images...');
+  selectedImages = [];
+  
+  for (let file of files) {
+    if (file.type.startsWith('image/')) {
+      const optimized = await compressImage(file);
+      selectedImages.push(optimized);
+    } else {
+      selectedImages.push(file);
+    }
+  }
+  
   const previews = document.getElementById('imagePreviews');
   previews.innerHTML = '';
   selectedImages.forEach((file, i) => {
@@ -1284,22 +1387,32 @@ function handleImages(e) {
     wrap.style.cssText = 'position:relative;width:70px;height:70px;';
     wrap.innerHTML = `
       <img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);" />
-      <button onclick="removeImage(${i})" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#c05050;border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+      <button onclick="removeImage(${i}); event.stopPropagation();" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#c05050;border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
+    `;
+    previews.appendChild(wrap);
+  });
+  
+  const zone = document.getElementById('imageDropZone');
+  zone.style.display = selectedImages.length ? 'none' : 'block';
+  showToast(`✅ ${selectedImages.length} Images compressed & ready!`);
+}
+
+function removeImage(index) {
+  selectedImages.splice(index, 1);
+  const previews = document.getElementById('imagePreviews');
+  previews.innerHTML = '';
+  selectedImages.forEach((file, i) => {
+    const url = URL.createObjectURL(file);
+    const wrap = document.createElement('div');
+    wrap.style.cssText = 'position:relative;width:70px;height:70px;';
+    wrap.innerHTML = `
+      <img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;border:1.5px solid var(--border);" />
+      <button onclick="removeImage(${i}); event.stopPropagation();" style="position:absolute;top:-6px;right:-6px;width:18px;height:18px;border-radius:50%;background:#c05050;border:none;color:#fff;font-size:10px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;">✕</button>
     `;
     previews.appendChild(wrap);
   });
   const zone = document.getElementById('imageDropZone');
   zone.style.display = selectedImages.length ? 'none' : 'block';
-  showToast(`${selectedImages.length} image(s) selected`);
-}
-
-function removeImage(index) {
-  selectedImages.splice(index, 1);
-  // Re-render previews
-  const dt = new DataTransfer();
-  selectedImages.forEach(f => dt.items.add(f));
-  document.getElementById('imageInput').files = dt.files;
-  handleImages({ target: { files: dt.files } });
 }
 
 async function startAutoPost() {
@@ -1309,19 +1422,21 @@ async function startAutoPost() {
   const caption = document.getElementById('postText').value.trim();
   if (!caption) { showToast('Add a caption first'); return; }
 
-  const selectedGroups = groups.filter(g => selectedIds.has(g.id) && g.status === 'pending' && g.link);
-  if (selectedGroups.length !== 1) {
-    showToast('Select exactly 1 pending group first');
-    alert('Safety lock: choose exactly 1 group before auto-posting.\n\nTap "☑ Select", tap one group, then press Auto-Post again.');
-    return;
+  // Option A Strategy Selection Logic
+  let targetGroups = [];
+  if (selectedIds.size > 0) {
+    targetGroups = groups.filter(g => selectedIds.has(g.id) && g.link);
+  } else {
+    targetGroups = groups.filter(g => g.status === 'pending' && g.link);
   }
 
-  if (!confirm(`Auto-post to ONLY this group?\n\n${selectedGroups[0].name}\n\nThis will not post to other groups.`)) return;
+  if (targetGroups.length === 0) { showToast('No matching active groups selected'); return; }
 
-  // Build form data
+  if (!confirm(`Auto-post to ${targetGroups.length} groups?\n\nImages are optimized for ultra-fast network delivery.`)) return;
+
   const formData = new FormData();
   formData.append('caption', caption);
-  formData.append('groups', JSON.stringify(selectedGroups));
+  formData.append('groups', JSON.stringify(targetGroups));
   selectedImages.forEach(img => formData.append('images', img));
 
   const btn = document.getElementById('autoPostBtn');
@@ -1334,17 +1449,18 @@ async function startAutoPost() {
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || 'Unknown error');
 
-    showToast(`✅ Session sent! Run: node poster.js on your PC`);
-    btn.textContent = '✅ Session Sent to PC';
+    showToast(`✅ Deployment sequence triggered on PC!`);
+    btn.textContent = '⚡ Running Automation...';
 
-    // Show stop button + progress
     document.getElementById('autoStopBtn').style.display = 'block';
     document.getElementById('autoProgress').style.display = 'block';
-    startProgressPolling(url, selectedGroups.length);
+    
+    if (multiSelectMode) toggleMultiSelect();
+    startProgressPolling(url, targetGroups.length);
 
   } catch (err) {
     showToast('❌ Failed: ' + err.message);
-    btn.textContent = '🚀 Auto-Post Selected Group Only';
+    btn.textContent = '🚀 Start Auto-Post';
     btn.style.opacity = '1';
     btn.disabled = false;
   }
@@ -1355,7 +1471,8 @@ async function stopAutoPost() {
   try { await fetch(`${url}/stop`, { method: 'POST' }); } catch {}
   clearInterval(autoPostInterval);
   document.getElementById('autoStopBtn').style.display = 'none';
-  document.getElementById('autoPostBtn').textContent = '🚀 Auto-Post Selected Group Only';
+  document.getElementById('autoProgress').style.display = 'none';
+  document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post';
   document.getElementById('autoPostBtn').disabled = false;
   document.getElementById('autoPostBtn').style.opacity = '1';
   showToast('Auto-post stopped');
@@ -1367,44 +1484,47 @@ function startProgressPolling(url, total) {
     try {
       const res = await fetch(`${url}/status`);
       const data = await res.json();
-      const done = data.progress?.done || 0;
+      
+      // Clean mapping translation matching our backend layout structure
+      const done = data.session?.progress?.done || 0;
       const pct = total ? (done / total * 100) : 0;
 
       document.getElementById('autoProgressBar').style.width = pct + '%';
-      document.getElementById('autoProgressText').textContent = `Posting... ${done} / ${total} groups done`;
+      document.getElementById('autoProgressText').textContent = `Posting... ${done} / ${total} groups complete`;
 
-      // Update group list display
-      if (data.groups) {
-        document.getElementById('autoGroupList').innerHTML = data.groups.map(g => {
+      if (data.session && data.session.groups) {
+        document.getElementById('autoGroupList').innerHTML = data.session.groups.map(g => {
           const icons = { done: '✅', failed: '❌', pending: '⏳' };
           const colors = { done: '#3a7d52', failed: '#c05050', pending: 'var(--text-dim)' };
-          return `<div style="font-size:12px;color:${colors[g.status]||'var(--text-dim)'};display:flex;align-items:center;gap:6px;">
-            <span>${icons[g.status]||'⏳'}</span><span>${g.name}</span>
+          return `<div style="font-size:12px;color:${colors[g.status] || 'var(--text-dim)'};display:flex;align-items:center;gap:6px;">
+            <span>${icons[g.status] || '⏳'}</span><span>${g.name}</span>
           </div>`;
         }).join('');
-      }
 
-      // Sync group statuses back to our app
-      if (data.groups) {
-        data.groups.forEach(serverGroup => {
-          if (serverGroup.status === 'done') {
-            const local = groups.find(g => g.id === serverGroup.id);
-            if (local && local.status !== 'done') {
-              local.status = 'done';
-              saveData(); render();
-            }
+        // Sync data variables cleanly back into localStorage state arrays
+        data.session.groups.forEach(serverGroup => {
+          const local = groups.find(g => g.id === serverGroup.id);
+          if (local && serverGroup.status !== 'pending' && local.status !== serverGroup.status) {
+            local.status = serverGroup.status;
+            saveData();
           }
         });
+        render();
       }
 
-      if (done >= total || !data.running && done > 0) {
+      if (done >= total || (!data.running && done > 0)) {
         clearInterval(autoPostInterval);
-        document.getElementById('autoProgressText').textContent = `✅ All ${total} groups posted!`;
+        document.getElementById('autoProgressText').textContent = `✅ All ${total} groups processed completely!`;
         document.getElementById('autoStopBtn').style.display = 'none';
-        showToast('🎉 Auto-posting complete!');
+        document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post';
+        document.getElementById('autoPostBtn').disabled = false;
+        document.getElementById('autoPostBtn').style.opacity = '1';
+        showToast('🎉 Auto-posting session complete!');
       }
-    } catch {}
-  }, 5000); // poll every 5 seconds
+    } catch (e) {
+      console.error("Polling validation mismatch:", e);
+    }
+  }, 4000);
 }
 
 loadData();
