@@ -1,740 +1,1354 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html lang="th">
 <head>
-    <meta charset="utf-8"/>
-    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-    <title>PostTracker - Editorial Dashboard</title>
-    
-    <!-- Fonts & Icons -->
-    <link href="https://fonts.googleapis.com" rel="preconnect"/>
-    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
-    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-    
-    <!-- Tailwind Engine -->
-    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
-    <script id="tailwind-config">
-        tailwind.config = {
-          darkMode: "class",
-          theme: {
-            extend: {
-              "colors": {
-                "surface-bright": "#fbf9f8",
-                "on-primary": "#ffffff",
-                "on-surface": "#1b1c1c",
-                "secondary-fixed-dim": "#c6c6c7",
-                "background": "#fbf9f8",
-                "secondary-container": "#dfe0e0",
-                "secondary-fixed": "#e2e2e2",
-                "surface-variant": "#e4e2e2",
-                "error-container": "#ffdad6",
-                "primary-fixed-dim": "#c8c6c5",
-                "on-secondary-fixed-variant": "#454747",
-                "on-error-container": "#93000a",
-                "surface-dim": "#dbdad9",
-                "error": "#ba1a1a",
-                "on-surface-variant": "#444748",
-                "primary": "#000000",
-                "surface-container-highest": "#e4e2e2",
-                "inverse-surface": "#303031",
-                "on-primary-fixed": "#1c1b1b",
-                "on-primary-container": "#858383",
-                "on-secondary": "#ffffff",
-                "on-secondary-container": "#616363",
-                "on-primary-fixed-variant": "#474646",
-                "surface-tint": "#5f5e5e",
-                "on-secondary-fixed": "#1a1c1c",
-                "primary-fixed": "#e5e2e1",
-                "tertiary-fixed-dim": "#c7c7c3",
-                "primary-container": "#1c1b1b",
-                "surface-container": "#efeded",
-                "inverse-primary": "#c8c6c5",
-                "on-error": "#ffffff",
-                "outline": "#747878",
-                "on-tertiary-fixed-variant": "#464744",
-                "on-secondary-fixed-dim": "#c6c6c7",
-                "on-tertiary": "#ffffff",
-                "secondary": "#5d5f5f",
-                "on-tertiary-fixed": "#1b1c1a",
-                "surface-container-lowest": "#ffffff",
-                "outline-variant": "#c4c7c7",
-                "tertiary": "#000000",
-                "tertiary-fixed": "#e3e2df",
-                "surface-container-high": "#e9e8e7",
-                "tertiary-container": "#1b1c1a",
-                "on-tertiary-container": "#848481",
-                "on-background": "#1b1c1c",
-                "inverse-on-surface": "#f2f0f0"
-              },
-              "borderRadius": {
-                "DEFAULT": "0.25rem",
-                "lg": "0.5rem",
-                "xl": "0.75rem",
-                "full": "9999px"
-              },
-              "spacing": {
-                "container-max": "1280px",
-                "stack-sm": "8px",
-                "gutter": "24px",
-                "stack-lg": "32px",
-                "margin-mobile": "16px",
-                "margin-desktop": "40px",
-                "stack-md": "16px",
-                "unit": "8px",
-                "section-gap": "64px"
-              },
-              "fontFamily": {
-                "body-sm": ["DM Sans"],
-                "display-lg-mobile": ["DM Serif Display"],
-                "body-md": ["DM Sans"],
-                "body-lg": ["DM Sans"],
-                "headline-sm": ["DM Serif Display"],
-                "label-md": ["DM Sans"],
-                "label-sm": ["DM Sans"],
-                "display-lg": ["DM Serif Display"],
-                "headline-md": ["DM Serif Display"]
-              },
-              "fontSize": {
-                "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                "display-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "400"}],
-                "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
-                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
-                "headline-sm": ["24px", {"lineHeight": "1.3", "fontWeight": "400"}],
-                "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
-                "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
-                "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
-                "headline-md": ["32px", {"lineHeight": "1.2", "fontWeight": "400"}]
-              }
-            },
-          },
-        }
-    </script>
-    <style>
-        .material-symbols-outlined {
-            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
-            display: inline-block;
-            vertical-align: middle;
-        }
-        .status-emerald { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
-        .status-amber { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
-        .status-gray { background-color: rgba(156, 163, 175, 0.1); color: #6b7280; }
-        
-        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
-        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
-        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e2e1; border-radius: 10px; }
-        
-        #progressBar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
-        body { min-height: max(884px, 100dvh); }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Post-Tracker</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #f5f4f0;
+    --surface: #ffffff;
+    --card: #ffffff;
+    --border: #e8e6e1;
+    --border-soft: #f0ede8;
+
+    --text: #1a1916;
+    --text-mid: #7a7672;
+    --text-dim: #b0ada8;
+
+    --approved-bg: #1a1916;
+    --approved-text: #ffffff;
+    --approved-card: #f7f6f4;
+    --approved-dot: #1a1916;
+
+    --waiting-bg: #fff8ee;
+    --waiting-text: #c07a20;
+    --waiting-border: #f0d0a0;
+    --waiting-card: #fffcf7;
+    --waiting-dot: #e09040;
+
+    --pending-dot: #d8d5d0;
+
+    /* Session highlight */
+    --session-glow: #1a1916;
+    --session-card: #fffff8;
+    --session-border: #1a1916;
+
+    --r: 16px;
+    --r-sm: 10px;
+    --r-full: 100px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', 'Sarabun', sans-serif;
+    min-height: 100vh;
+    padding-bottom: 140px;
+    font-weight: 400;
+  }
+
+  /* ─── HEADER ─── */
+  .header {
+    background: var(--bg);
+    padding: 32px 20px 20px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+  }
+
+  .brand { display: flex; flex-direction: column; gap: 2px; }
+  .brand-sub { font-size: 11px; font-weight: 500; color: var(--text-dim); letter-spacing: 0.5px; }
+  .brand-title { font-size: 26px; font-weight: 400; color: var(--text); line-height: 1.1; }
+
+  .reset-btn {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text-mid);
+    padding: 8px 16px;
+    border-radius: var(--r-full);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .reset-btn:active { background: var(--border); }
+
+  .progress-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    margin-bottom: 10px;
+  }
+  .progress-meta .label { font-size: 12px; font-weight: 500; color: var(--text-dim); }
+  .progress-meta .count { font-family: 'DM Serif Display', serif; font-size: 20px; color: var(--text); }
+
+  .progress-track {
+    background: var(--border);
+    height: 6px;
+    width: 100%;
+    border-radius: var(--r-full);
+    overflow: hidden;
+  }
+  .progress-fill {
+    height: 6px;
+    background: var(--text);
+    border-radius: var(--r-full);
+    transition: width 0.5s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  /* ─── SESSION BANNER ─── */
+  .session-banner {
+    background: var(--text);
+    color: #fff;
+    padding: 10px 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 500;
+    letter-spacing: 0.3px;
+    display: none;
+  }
+  .session-banner.active { display: flex; }
+  .session-banner .session-info { display: flex; align-items: center; gap: 8px; }
+  .session-pulse {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: #fff;
+    animation: pulse 1.5s ease-in-out infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+  .session-stop-btn {
+    background: rgba(255,255,255,0.2);
+    border: 1px solid rgba(255,255,255,0.4);
+    color: #fff;
+    padding: 5px 12px;
+    border-radius: var(--r-full);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+  }
+
+  /* ─── CONTENT ─── */
+  .content { padding: 16px; max-width: 480px; margin: 0 auto; }
+
+  .post-card {
+    background: var(--surface);
+    border-radius: var(--r);
+    padding: 20px;
+    margin-bottom: 16px;
+    border: 1.5px solid var(--border);
+  }
+
+  .card-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 12px;
+  }
+
+  .post-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    font-weight: 400;
+    line-height: 1.7;
+    padding: 12px 14px;
+    resize: none;
+    min-height: 90px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .post-textarea:focus { border-color: var(--text); }
+  .post-textarea::placeholder { color: var(--text-dim); }
+
+  .copy-btn {
+    margin-top: 12px;
+    background: var(--text);
+    border: none;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 13px 20px;
+    width: 100%;
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: var(--r-sm);
+  }
+  .copy-btn:active { opacity: 0.8; transform: scale(0.99); }
+  .copy-btn.copied { background: #3a7d52; }
+
+  .section-divider {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 4px 0 14px;
+  }
+  .section-divider .line { flex: 1; height: 1px; background: var(--border); }
+  .section-divider .label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  /* ─── TOOLBAR ROW ─── */
+  .toolbar-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 10px;
+    align-items: center;
+  }
+
+  /* Session button */
+  .session-btn {
+    padding: 9px 14px;
+    background: var(--text);
+    border: none;
+    color: #fff;
+    border-radius: var(--r-full);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .session-btn:active { opacity: 0.8; transform: scale(0.97); }
+  .session-btn.session-active {
+    background: #3a7d52;
+  }
+
+  /* Multi-select button */
+  .multiselect-btn {
+    padding: 9px 14px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    color: var(--text-mid);
+    border-radius: var(--r-full);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+  .multiselect-btn:active { transform: scale(0.97); }
+  .multiselect-btn.ms-active {
+    background: var(--text);
+    border-color: var(--text);
+    color: #fff;
+    font-weight: 600;
+  }
+
+  /* ─── BULK ACTION BAR ─── */
+  .bulk-bar {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    padding: 12px 14px;
+    margin-bottom: 10px;
+    display: none;
+    gap: 8px;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+  .bulk-bar.visible { display: flex; }
+
+  .bulk-count {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-mid);
+    flex: 1;
+  }
+
+  .bulk-action-btn {
+    padding: 8px 14px;
+    border-radius: var(--r-full);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1.5px solid transparent;
+    transition: all 0.2s;
+  }
+  .bulk-action-btn:active { opacity: 0.7; }
+
+  .bulk-btn-done {
+    background: var(--approved-bg);
+    color: #fff;
+    border-color: var(--approved-bg);
+  }
+  .bulk-btn-wait {
+    background: var(--waiting-bg);
+    color: var(--waiting-text);
+    border-color: var(--waiting-border);
+  }
+  .bulk-btn-reset {
+    background: var(--bg);
+    color: var(--text-mid);
+    border-color: var(--border);
+  }
+  .bulk-select-all-btn {
+    background: transparent;
+    color: var(--text-mid);
+    border-color: var(--border);
+    font-weight: 500;
+  }
+
+  /* ─── FILTER TABS ─── */
+  .filter-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex: 1;
+  }
+
+  .filter-tab {
+    flex: 1;
+    padding: 10px 8px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-full);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    color: var(--text-mid);
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 5px;
+  }
+  .filter-tab:active { transform: scale(0.97); }
+
+  .filter-tab.tab-all.active { background: var(--text); border-color: var(--text); color: #fff; }
+  .filter-tab.tab-approved.active { background: var(--text); border-color: var(--text); color: #fff; }
+  .filter-tab.tab-waiting.active { background: var(--waiting-bg); border-color: var(--waiting-border); color: var(--waiting-text); }
+
+  .tab-count { font-size: 12px; font-weight: 600; opacity: 0.7; }
+
+  /* ─── GROUP ITEM ─── */
+  .group-item {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    margin-bottom: 10px;
+    overflow: hidden;
+    transition: border-color 0.2s, background 0.2s, box-shadow 0.3s;
+    user-select: none;
+  }
+
+  .group-item.status-done { background: var(--approved-card); border-color: var(--border); }
+  .group-item.status-waiting { background: var(--waiting-card); border-color: var(--waiting-border); }
+
+  /* Session highlight — next pending group */
+  .group-item.session-next {
+    border-color: var(--session-border);
+    border-width: 2px;
+    box-shadow: 0 0 0 3px rgba(26,25,22,0.08);
+    background: var(--session-card);
+  }
+
+  /* Multi-select selected */
+  .group-item.ms-selected {
+    border-color: var(--text);
+    border-width: 2px;
+    background: #f0ede8;
+  }
+
+  .group-main {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 14px 16px;
+    cursor: pointer;
+  }
+
+  /* Checkbox (multi-select mode) */
+  .ms-checkbox {
+    width: 20px;
+    height: 20px;
+    border-radius: 6px;
+    border: 2px solid var(--border);
+    background: var(--bg);
+    flex-shrink: 0;
+    display: none;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.15s;
+    font-size: 11px;
+    color: #fff;
+    font-weight: 700;
+  }
+  .ms-mode .ms-checkbox { display: flex; }
+  .group-item.ms-selected .ms-checkbox {
+    background: var(--text);
+    border-color: var(--text);
+  }
+
+  /* Session badge on next item */
+  .session-badge {
+    display: none;
+    font-size: 10px;
+    font-weight: 700;
+    color: var(--text);
+    background: #fff;
+    border: 1.5px solid var(--text);
+    padding: 2px 8px;
+    border-radius: var(--r-full);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    flex-shrink: 0;
+  }
+  .group-item.session-next .session-badge { display: block; }
+
+  .status-dot {
+    width: 9px; height: 9px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: all 0.25s;
+  }
+  .status-pending .status-dot { background: var(--pending-dot); }
+  .status-done .status-dot { background: var(--approved-dot); }
+  .status-waiting .status-dot { background: var(--waiting-dot); }
+
+  .group-info { flex: 1; min-width: 0; }
+  .group-name {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--text);
+    line-height: 1.4;
+    transition: color 0.2s;
+  }
+  .status-done .group-name { color: var(--text-dim); text-decoration: line-through; text-decoration-color: var(--text-dim); }
+  .status-waiting .group-name { color: var(--waiting-text); }
+  .session-next .group-name { font-weight: 600; }
+
+  .group-note { font-size: 11px; color: #c07a20; margin-top: 2px; font-style: italic; }
+
+  .group-badge {
+    font-size: 11px;
+    font-weight: 600;
+    padding: 4px 10px;
+    border-radius: var(--r-full);
+    flex-shrink: 0;
+  }
+  .status-pending .group-badge { color: var(--text-dim); background: var(--bg); border: 1.5px solid var(--border); }
+  .status-done .group-badge { color: #fff; background: var(--approved-dot); border: 1.5px solid var(--approved-dot); }
+  .status-waiting .group-badge { color: var(--waiting-text); background: var(--waiting-bg); border: 1.5px solid var(--waiting-border); }
+
+  /* Action buttons row */
+  .group-actions {
+    display: flex;
+    border-top: 1.5px solid var(--border-soft);
+    padding: 6px 8px;
+    gap: 6px;
+  }
+  .status-waiting .group-actions { border-color: var(--waiting-border); }
+
+  .group-action-btn {
+    flex: 1;
+    padding: 9px 4px;
+    background: transparent;
+    border: 1.5px solid transparent;
+    border-radius: var(--r-sm);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 11px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    color: var(--text-mid);
+  }
+  .group-action-btn:active { opacity: 0.6; }
+
+  /* One-tap Post & Mark button */
+  .group-action-btn.btn-post-mark {
+    background: var(--text);
+    color: #fff;
+    border-color: var(--text);
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 0.2px;
+  }
+  .group-action-btn.btn-post-mark:active { opacity: 0.75; transform: scale(0.98); }
+
+  .group-action-btn.btn-wait { color: var(--text-mid); }
+  .group-action-btn.btn-wait.active-wait { background: var(--waiting-bg); color: var(--waiting-text); border-color: var(--waiting-border); font-weight: 600; }
+  .group-action-btn.btn-delete-item { color: var(--text-dim); }
+  .group-action-btn.btn-delete-item:active { color: #c05050; background: #fff0f0; }
+
+  /* Add group */
+  .add-container {
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px;
+  }
+
+  .add-input {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    color: var(--text);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 14px;
+    padding: 11px 14px;
+    outline: none;
+    border-radius: var(--r-sm);
+    transition: border-color 0.2s;
+  }
+  .add-input::placeholder { color: var(--text-dim); }
+  .add-input:focus { border-color: var(--text); }
+
+  .add-submit-btn {
+    background: var(--text);
+    border: none;
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    padding: 12px;
+    cursor: pointer;
+    border-radius: var(--r-sm);
+    transition: opacity 0.2s;
+  }
+  .add-submit-btn:active { opacity: 0.75; }
+
+  /* ─── BOTTOM BAR ─── */
+  .bottom-bar {
+    position: fixed;
+    bottom: 0; left: 0; right: 0;
+    background: rgba(245,244,240,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-top: 1.5px solid var(--border);
+    padding: 14px 16px 20px;
+    display: flex;
+    gap: 10px;
+    max-width: 480px;
+    margin: 0 auto;
+    z-index: 200;
+  }
+
+  .bar-btn {
+    flex: 1;
+    padding: 14px;
+    border-radius: var(--r-full);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 13px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s;
+    border: none;
+  }
+  .bar-btn:active { transform: scale(0.97); }
+
+  .bar-reset { background: var(--surface); color: var(--text-mid); border: 1.5px solid var(--border); }
+  .bar-all-done { background: var(--text); color: #fff; border: none; font-weight: 600; }
+
+  /* ─── TOAST ─── */
+  .toast {
+    position: fixed;
+    bottom: 100px;
+    left: 50%;
+    transform: translateX(-50%) translateY(8px);
+    background: var(--text);
+    color: #fff;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+    padding: 10px 20px;
+    border-radius: var(--r-full);
+    opacity: 0;
+    transition: all 0.3s;
+    pointer-events: none;
+    white-space: nowrap;
+    z-index: 1000;
+  }
+  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+  .complete-wrap {
+    text-align: center;
+    padding: 32px 20px;
+    animation: fadeUp 0.5s ease;
+  }
+  .complete-wrap .complete-icon { font-size: 32px; margin-bottom: 8px; }
+  .complete-wrap p { font-size: 13px; font-weight: 500; color: var(--text-mid); letter-spacing: 0.3px; }
+
+  .empty-state {
+    text-align: center;
+    padding: 32px 20px;
+    color: var(--text-dim);
+    font-size: 13px;
+    background: var(--surface);
+    border: 1.5px dashed var(--border);
+    border-radius: var(--r);
+    margin-bottom: 10px;
+  }
+
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+
+  /* ─── TEMPLATE CARDS STRIP ─── */
+  .templates-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .templates-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    padding-bottom: 6px;
+    margin-bottom: 16px;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+  }
+  .templates-scroll::-webkit-scrollbar { display: none; }
+
+  .template-card {
+    background: var(--surface);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r);
+    padding: 14px;
+    min-width: 200px;
+    max-width: 200px;
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  .template-card-label {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-dim);
+    letter-spacing: 0.4px;
+  }
+
+  .template-textarea {
+    width: 100%;
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    border-radius: var(--r-sm);
+    color: var(--text);
+    font-family: 'Sarabun', sans-serif;
+    font-size: 13px;
+    line-height: 1.6;
+    padding: 10px 12px;
+    resize: none;
+    min-height: 72px;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .template-textarea:focus { border-color: var(--text); }
+  .template-textarea::placeholder { color: var(--text-dim); }
+
+  .template-copy-btn {
+    background: var(--bg);
+    border: 1.5px solid var(--border);
+    color: var(--text-mid);
+    font-family: 'DM Sans', sans-serif;
+    font-size: 12px;
+    font-weight: 500;
+    padding: 9px;
+    border-radius: var(--r-sm);
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 100%;
+  }
+  .template-copy-btn:active { opacity: 0.7; }
+  .template-copy-btn.copied { background: #3a7d52; color: #fff; border-color: #3a7d52; }
+
+  .ms-mode .group-actions { display: none; }
+  .ms-mode .group-main { cursor: pointer; }
+
+  /* Style สำหรับ Preview รูปที่เลือก */
+  .preview-wrapper {
+    position: relative; width: 60px; height: 60px;
+    border-radius: 8px; overflow: hidden; border: 1.5px solid var(--border);
+  }
+  .preview-wrapper img { width: 100%; height: 100%; object-fit: cover; }
+  .preview-remove {
+    position: absolute; top: 2px; right: 2px; background: rgba(0,0,0,0.6);
+    color: #fff; border: none; border-radius: 50%; width: 16px; height: 16px;
+    font-size: 10px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+  }
+</style>
 </head>
-<body class="bg-background text-on-background font-body-md min-h-screen pb-24 md:pb-0">
+<body>
 
-    <!-- Top Navigation Bar -->
-    <header class="fixed top-0 w-full z-50 flex justify-between items-center px-4 md:px-margin-desktop h-16 bg-surface border-b border-surface-variant">
-        <div class="flex items-center gap-stack-sm">
-            <span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
-            <h1 class="font-headline-sm text-[20px] md:text-headline-sm font-bold text-primary">PostTracker</h1>
+<div class="header">
+  <div class="header-top">
+    <div class="brand">
+      <span class="brand-sub">Watch Group</span>
+      <span class="brand-title">Posting Board</span>
+    </div>
+    <button class="reset-btn" onclick="resetAll()">Reset All</button>
+  </div>
+  <div class="progress-section">
+    <div class="progress-meta">
+      <span class="label">Progress</span>
+      <span class="count" id="progressText">0 / 0</span>
+    </div>
+    <div class="progress-track">
+      <div class="progress-fill" id="progressBar" style="width:0%"></div>
+    </div>
+  </div>
+</div>
+
+<div class="session-banner" id="sessionBanner">
+  <div class="session-info">
+    <div class="session-pulse"></div>
+    <span id="sessionLabel">Session: 0 of 0 done</span>
+  </div>
+  <button class="session-stop-btn" onclick="stopSession()">Stop</button>
+</div>
+
+<div class="content">
+  <div class="post-card">
+    <div class="card-label">Caption</div>
+    <textarea class="post-textarea" id="postText" placeholder="วางข้อความที่จะโพสต์ที่นี่..." oninput="saveData()"></textarea>
+    <button class="copy-btn" id="copyBtn" onclick="copyText()">Copy Caption</button>
+  </div>
+
+  <div class="post-card" id="autoPosterCard">
+    <div class="card-label">🤖 Auto-Poster</div>
+
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:6px;">PC SERVER URL</div>
+      <div style="display:flex;gap:8px;align-items:center;">
+        <input id="serverUrl" type="url" placeholder="https://your-app.up.railway.app"
+          style="flex:1;background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r-sm);color:var(--text);font-family:'DM Sans',sans-serif;font-size:13px;padding:10px 12px;outline:none;"
+          oninput="saveServerUrl()" />
+        <button onclick="checkServer()" id="pingBtn"
+          style="background:var(--surface);border:1.5px solid var(--border);color:var(--text-mid);font-family:'DM Sans',sans-serif;font-size:12px;font-weight:600;padding:10px 14px;border-radius:var(--r-sm);cursor:pointer;white-space:nowrap;">
+          Ping
+        </button>
+      </div>
+      <div id="serverStatus" style="font-size:11px;margin-top:6px;color:var(--text-dim);">Enter your Railway URL above</div>
+    </div>
+
+    <div style="margin-bottom:12px;">
+      <div style="font-size:11px;font-weight:600;color:var(--text-dim);letter-spacing:0.5px;margin-bottom:6px;">IMAGES</div>
+      <div id="imageDropZone" onclick="document.getElementById('imageInput').click()"
+        style="border:1.5px dashed var(--border);border-radius:var(--r-sm);padding:16px;text-align:center;cursor:pointer;background:var(--bg);transition:border-color 0.2s;">
+        <div style="font-size:24px;margin-bottom:4px;">📷</div>
+        <div style="font-size:13px;font-weight:500;color:var(--text-mid);">Tap to select images</div>
+        <div style="font-size:11px;color:var(--text-dim);margin-top:2px;">JPG, PNG up to 20MB each</div>
+      </div>
+      <input type="file" id="imageInput" accept="image/*" multiple style="display:none;" onchange="handleImages(event)" />
+      <div id="imagePreviews" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:8px;"></div>
+    </div>
+
+    <button id="autoPostBtn" onclick="startAutoPost()"
+      style="width:100%;background:var(--text);border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:14px 20px;border-radius:var(--r-sm);cursor:pointer;transition:all 0.2s;letter-spacing:0.3px;">
+      🚀 Start Auto-Post to All Groups
+    </button>
+
+    <button id="autoStopBtn" onclick="stopAutoPost()"
+      style="display:none;width:100%;background:#c05050;border:none;color:#fff;font-family:'DM Sans',sans-serif;font-size:14px;font-weight:700;padding:14px 20px;border-radius:var(--r-sm);cursor:pointer;margin-top:8px;">
+      ⛔ Stop Auto-Post
+    </button>
+
+    <div id="autoProgress" style="display:none;margin-top:12px;">
+      <div style="font-size:12px;font-weight:600;color:var(--text-mid);margin-bottom:6px;" id="autoProgressText">Posting...</div>
+      <div style="background:var(--border);height:6px;border-radius:100px;overflow:hidden;">
+        <div id="autoProgressBar" style="height:6px;background:var(--text);border-radius:100px;width:0%;transition:width 0.5s;"></div>
+      </div>
+      <div id="autoGroupList" style="margin-top:10px;display:flex;flex-direction:column;gap:4px;"></div>
+    </div>
+  </div>
+
+  <div class="post-card" style="padding-bottom:14px;">
+    <div class="templates-label">Templates</div>
+    <div class="templates-scroll">
+      <div class="template-card">
+        <div class="template-card-label">📌 Header</div>
+        <textarea class="template-textarea" id="headerText" placeholder="หัวข้อโพสต์..." oninput="saveTpl()"></textarea>
+        <button class="template-copy-btn" onclick="copyTpl('headerText', this)">Copy Header</button>
+      </div>
+      <div class="template-card">
+        <div class="template-card-label">💬 Group Chat</div>
+        <textarea class="template-textarea" id="groupChatText" placeholder="ข้อความกลุ่มแชท..." oninput="saveTpl()"></textarea>
+        <button class="template-copy-btn" onclick="copyTpl('groupChatText', this)">Copy Group Chat</button>
+      </div>
+      <div class="template-card">
+        <div class="template-card-label">🔗 Line @</div>
+        <textarea class="template-textarea" id="lineText" placeholder="ข้อความ Line @..." oninput="saveTpl()"></textarea>
+        <button class="template-copy-btn" onclick="copyTpl('lineText', this)">Copy Line @</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-divider">
+    <div class="line"></div>
+    <div class="label">Groups</div>
+    <div class="line"></div>
+  </div>
+
+  <div class="toolbar-row">
+    <button class="session-btn" id="sessionBtn" onclick="toggleSession()">▶ Start Session</button>
+    <button class="multiselect-btn" id="msBtn" onclick="toggleMultiSelect()">☑ Select</button>
+  </div>
+
+  <div class="bulk-bar" id="bulkBar">
+    <span class="bulk-count" id="bulkCount">0 selected</span>
+    <button class="bulk-action-btn bulk-select-all-btn" onclick="bulkSelectAll()">All</button>
+    <button class="bulk-action-btn bulk-btn-done" onclick="bulkSetStatus('done')">✓ Posted</button>
+    <button class="bulk-action-btn bulk-btn-wait" onclick="bulkSetStatus('waiting')">⏳ Waiting</button>
+    <button class="bulk-action-btn bulk-btn-reset" onclick="bulkSetStatus('pending')">↺ Reset</button>
+  </div>
+
+  <div class="filter-tabs" id="filterTabs">
+    <button class="filter-tab tab-all active" onclick="setFilter('all')">
+      All <span class="tab-count" id="countAll">0</span>
+    </button>
+    <button class="filter-tab tab-approved" onclick="setFilter('done')">
+      ✓ <span class="tab-count" id="countDone">0</span>
+    </button>
+    <button class="filter-tab tab-waiting" onclick="setFilter('waiting')">
+      ⏳ <span class="tab-count" id="countWaiting">0</span>
+    </button>
+  </div>
+
+  <div id="groupList"></div>
+
+  <div class="add-container">
+    <input class="add-input" id="addInputName" type="text" placeholder="ชื่อกลุ่มใหม่..." maxlength="80">
+    <input class="add-input" id="addInputLink" type="text" placeholder="ลิงก์กลุ่ม Facebook (หากมี)...">
+    <button class="add-submit-btn" onclick="addGroup()">เพิ่มกลุ่ม</button>
+  </div>
+
+  <div id="completeMsg"></div>
+</div>
+
+<div class="bottom-bar">
+  <button class="bar-btn bar-reset" onclick="resetDone()">Reset Status</button>
+  <button class="bar-btn bar-all-done" onclick="markAllDone()">Mark All Done</button>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const defaultGroups = [
+  { id: 1, name: "ซื้อ-ขายแลกเปลี่ยนนาฬิกา R watch", note: "ห้ามใส่ลิ้งค์ ใส่ id @ supwatch แทน", link: "https://www.facebook.com/share/g/1Cxe1beqhf/" },
+  { id: 2, name: "นาฬิกามือสอง โพสต์ขายฟรี", note: "", link: "https://www.facebook.com/share/g/1LM4n7tACt/" },
+  { id: 3, name: "นาฬิกามือสอง ออนไลน์", note: "", link: "https://www.facebook.com/share/g/1BLdJnsk1t/" },
+  { id: 4, name: "HRPT Watches Market Thailand", note: "", link: "https://www.facebook.com/share/g/1EMjs9g928/" },
+  { id: 5, name: "HRPT Thailand Market Talks", note: "", link: "https://www.facebook.com/share/g/1L91xTVgTB/?mibextid=wwXIfr" },
+  { id: 6, name: "ซื้อ-ขาย นาฬิกาเกรด Rep แบรนด์ทุกยี่ห้อ", note: "", link: "https://www.facebook.com/share/g/18pHWWZQYT/" },
+  { id: 7, name: "นาฬิกา มือสองทุกรุ่น", note: "", link: "https://www.facebook.com/share/g/1C9JwAgCTD/" },
+  { id: 8, name: "ขายนาฬิกามือ1และมือ2 ทุกแบรนไม่จำกัดราคา", note: "", link: "https://www.facebook.com/share/g/1FviQkkkbq/" },
+  { id: 9, name: "กลุ่มซื้อ-ขาย นาฬิกามือสอง ทุกรุ่น", note: "", link: "https://www.facebook.com/share/g/1BUsYAiXop/" }
+];
+
+let groups = [];
+let nextId = 100;
+let currentFilter = 'all';
+let sessionMode = false;
+let multiSelectMode = false;
+let selectedIds = new Set();
+let selectedFiles = [];
+let autoPostInterval = null;
+
+// ─── DATA MANAGEMENT ───
+function loadData() {
+  try {
+    const saved = localStorage.getItem('watchGroupsV4');
+    const savedPost = localStorage.getItem('postText');
+    const savedUrl = localStorage.getItem('serverUrl');
+    
+    if (saved) {
+      const p = JSON.parse(saved);
+      groups = p.groups || initGroups();
+      nextId = p.nextId || 100;
+    } else {
+      groups = initGroups();
+    }
+    
+    if (savedPost) document.getElementById('postText').value = savedPost;
+    if (savedUrl) document.getElementById('serverUrl').value = savedUrl;
+    
+    // โหลดข้อความ Templates ด้วย
+    ['headerText', 'groupChatText', 'lineText'].forEach(id => {
+      const tpl = localStorage.getItem(id);
+      if (tpl) document.getElementById(id).value = tpl;
+    });
+    
+  } catch(e) { 
+    groups = initGroups(); 
+  }
+}
+
+function initGroups() {
+  return defaultGroups.map(g => ({ ...g, status: 'pending' }));
+}
+
+function saveData() {
+  localStorage.setItem('watchGroupsV4', JSON.stringify({ groups, nextId }));
+  localStorage.setItem('postText', document.getElementById('postText').value);
+}
+
+function saveServerUrl() {
+  localStorage.setItem('serverUrl', document.getElementById('serverUrl').value.trim());
+}
+
+function saveTpl() {
+  ['headerText', 'groupChatText', 'lineText'].forEach(id => {
+    localStorage.setItem(id, document.getElementById(id).value);
+  });
+}
+
+// ─── FILTER & RENDER ───
+function setFilter(f) {
+  currentFilter = f;
+  document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
+  const map = { all: 'tab-all', done: 'tab-approved', waiting: 'tab-waiting' };
+  document.querySelector('.' + map[f])?.classList.add('active');
+  render();
+}
+
+function getVisible() {
+  if (currentFilter === 'all') return groups;
+  return groups.filter(g => g.status === currentFilter);
+}
+
+function render() {
+  const visible = getVisible();
+  const listDiv = document.getElementById('groupList');
+  
+  // อัปเดตตัวเลข Counts บน Filter Tabs
+  document.getElementById('countAll').textContent = groups.length;
+  document.getElementById('countDone').textContent = groups.filter(g => g.status === 'done').length;
+  document.getElementById('countWaiting').textContent = groups.filter(g => g.status === 'waiting').length;
+
+  // อัปเดต Progress Header
+  const doneCount = groups.filter(g => g.status === 'done').length;
+  document.getElementById('progressText').textContent = `${doneCount} / ${groups.length}`;
+  const percent = groups.length > 0 ? (doneCount / groups.length) * 100 : 0;
+  document.getElementById('progressBar').style.width = `${percent}%`;
+
+  if (visible.length === 0) {
+    listDiv.innerHTML = `<div class="empty-state">ไม่พบกลุ่มในหมวดหมู่นี้</div>`;
+    return;
+  }
+
+  // หา ID ของกลุ่ม pending ลำดับแรกสุดเพื่อใช้ใน Session Mode
+  let nextPendingId = null;
+  if (sessionMode) {
+    const nextG = groups.find(g => g.status === 'pending');
+    if (nextG) nextPendingId = nextG.id;
+  }
+
+  listDiv.innerHTML = visible.map(g => {
+    const isNext = g.id === nextPendingId;
+    const isSelected = selectedIds.has(g.id);
+    
+    let itemClasses = `group-item status-${g.status}`;
+    if (isNext) itemClasses += ' session-next';
+    if (isSelected) itemClasses += ' ms-selected';
+
+    return `
+      <div class="${itemClasses}" data-id="${g.id}">
+        <div class="group-main" onclick="handleGroupMainClick(${g.id})">
+          <div class="ms-checkbox">${isSelected ? '✓' : ''}</div>
+          <div class="status-dot"></div>
+          <div class="group-info">
+            <div class="group-name">${g.name}</div>
+            ${g.note ? `<div class="group-note">💡 ${g.note}</div>` : ''}
+          </div>
+          <span class="session-badge">ถัดไป</span>
+          <span class="group-badge">${g.status === 'done' ? 'Posted' : g.status === 'waiting' ? 'Waiting' : 'Pending'}</span>
         </div>
-        
-        <!-- Live Engine Server Configurations Locked In -->
-        <div class="hidden md:flex items-center gap-4">
-            <input id="railwayUrlInput" type="text" placeholder="https://your-railway.app" onchange="saveConfig()" class="text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-64 focus:ring-1 focus:ring-primary">
-            <input id="secretKeyInput" type="password" placeholder="Secret Key" onchange="saveConfig()" class="text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-32 focus:ring-1 focus:ring-primary">
+        <div class="group-actions">
+          <button class="group-action-btn btn-post-mark" onclick="launchLink(${g.id})">เปิดกลุ่ม ↗</button>
+          <button class="group-action-btn btn-wait ${g.status==='waiting'?'active-wait':''}" onclick="setStatus(${g.id}, 'waiting')">⏳ รออนุมัติ</button>
+          <button class="group-action-btn btn-delete-item" onclick="deleteGroup(${g.id})">ลบ</button>
         </div>
+      </div>
+    `;
+  }).join('');
+}
 
-        <div class="flex items-center gap-stack-md">
-            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-low text-label-sm font-label-sm" id="serverStatus">
-                <span id="statusIndicator" class="w-2 h-2 rounded-full bg-gray-400"></span> 
-                <span id="statusText">CHECKING</span>
-            </div>
-            <button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all active:scale-95" id="sessionBtn" onclick="toggleSession()">
-                New Session
-            </button>
-        </div>
-    </header>
+// ─── INTERACTIONS ───
+function handleGroupMainClick(id) {
+  if (multiSelectMode) {
+    toggleSelect(id);
+    return;
+  }
+  const g = groups.find(x => x.id === id);
+  if (!g) return;
+  g.status = (g.status === 'done') ? 'pending' : 'done';
+  saveData(); render();
+  showToast(g.status === 'done' ? 'Marked as Posted ✓' : 'Reset to Pending');
+}
 
-    <!-- Main Workspace Dashboard Content -->
-    <main class="pt-24 pb-12 px-4 md:px-margin-desktop max-w-container-max mx-auto space-y-section-gap">
-        
-        <!-- API Connection Details for Mobile Views -->
-        <section class="grid grid-cols-1 md:hidden gap-2 p-4 bg-surface-container-low rounded-xl">
-            <label class="text-[11px] font-bold uppercase text-secondary">Railway Backend Link</label>
-            <input id="railwayUrlInputMobile" type="text" placeholder="https://your-railway.app" oninput="syncConfig(this, 'railwayUrlInput')" class="text-sm bg-surface-container-lowest border-outline-variant rounded-lg p-2 focus:ring-primary">
-            <input id="secretKeyInputMobile" type="password" placeholder="Secret Password" oninput="syncConfig(this, 'secretKeyInput')" class="text-sm bg-surface-container-lowest border-outline-variant rounded-lg p-2 focus:ring-primary">
-        </section>
+function launchLink(id) {
+  const g = groups.find(x => x.id === id);
+  if (!g) return;
+  const text = document.getElementById('postText').value;
+  if (text.trim()) {
+    navigator.clipboard.writeText(text).catch(() => {});
+    showToast('คัดลอกข้อความและกำลังเปิดกลุ่ม ↗');
+  } else {
+    showToast('กำลังเปิดกลุ่ม ↗');
+  }
+  if (g.status === 'pending') g.status = 'waiting';
+  saveData(); render();
+  
+  if (sessionMode) setTimeout(scrollToNextPending, 400);
 
-        <!-- Progress Tracker Bar Section -->
-        <section class="space-y-stack-md">
-            <div class="flex flex-col md:flex-row justify-between items-baseline gap-4">
-                <h2 class="font-display-lg text-display-lg-mobile md:text-display-lg">Watch Group Tracker</h2>
-                <div class="flex items-center gap-stack-sm">
-                    <span class="font-label-md text-label-md text-on-surface-variant" id="runtimeStatusLabel">Campaign Progress</span>
-                    <span class="font-label-md text-label-md text-primary" id="progressText">0%</span>
-                </div>
-            </div>
-            <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
-                <div class="h-full bg-primary w-0" id="progressBar"></div>
-            </div>
-            
-            <!-- Live Active Session Monitoring Strip -->
-            <div class="hidden bg-primary-container text-on-primary-container p-4 rounded-xl flex justify-between items-center" id="sessionBanner">
-                <div class="flex items-center gap-stack-md">
-                    <span class="material-symbols-outlined text-white animate-spin" data-icon="sync">sync</span>
-                    <span class="font-label-md text-white">Active Session: Posting process is actively running via Railway...</span>
-                </div>
-                <button class="bg-error text-white px-4 py-1 rounded-lg font-label-sm hover:opacity-90 transition-all" onclick="stopPosterSession()">Emergency Stop</button>
-            </div>
-        </section>
+  if (g.link) window.open(g.link, '_blank');
+  else showToast('กลุ่มนี้ไม่มีลิ้งค์');
+}
 
-        <!-- Bento Grid Layout System -->
-        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
-            
-            <!-- Left Workspace Partition: Composer & Card Blocks -->
-            <div class="lg:col-span-7 space-y-stack-lg">
-                <!-- Composer Platform Card -->
-                <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(18,18,18,0.04)] border border-outline-variant/30 overflow-hidden">
-                    <div class="p-6 border-b border-surface-variant flex justify-between items-center">
-                        <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Universal Post Composer</h3>
-                        <button onclick="clearComposer()" class="text-xs text-secondary hover:text-error transition-all">Clear Composer</button>
-                    </div>
-                    <div class="p-6 space-y-stack-md">
-                        <textarea class="w-full min-h-[160px] p-4 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-lg font-body-md text-body-md resize-none placeholder:text-on-surface-variant/50 transition-all" id="postText" placeholder="What's the message for this blast?"></textarea>
-                        
-                        <div class="relative group cursor-pointer" id="imageDropZone">
-                            <div class="flex flex-col items-center justify-center p-8 bg-surface-bright border-2 border-dashed border-outline-variant rounded-xl group-hover:border-primary group-hover:bg-surface-container transition-all">
-                                <span class="material-symbols-outlined text-4xl text-outline mb-2" data-icon="add_photo_alternate">add_photo_alternate</span>
-                                <p class="font-label-md text-label-md text-on-surface-variant">Drop images here or click to browse</p>
-                                <p class="text-[10px] uppercase mt-1 text-outline" id="mediaCountLabel">Supports PNG, JPG, WEBP</p>
-                            </div>
-                            <input accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" id="imageInput" multiple type="file"/>
-                        </div>
-                        <div class="flex flex-wrap gap-stack-sm" id="imagePreviews"></div>
-                        
-                        <div class="flex justify-between items-center pt-4 border-t border-surface-variant">
-                            <div class="flex gap-2">
-                                <span class="text-xs text-outline bg-surface-container px-3 py-1.5 rounded-md font-mono" id="charCounter">0 characters</span>
-                            </div>
-                            <button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md hover:opacity-90 transition-all shadow-md" id="autoPostBtn" onclick="executeCampaignBlast()">
-                                <span class="material-symbols-outlined text-sm" data-icon="send">send</span> Blast to Selected Groups
-                            </button>
-                        </div>
-                    </div>
-                </div>
+function setStatus(id, status) {
+  const g = groups.find(x => x.id === id);
+  if (!g) return;
+  g.status = (g.status === status) ? 'pending' : status;
+  saveData(); render();
+  if (g.status === 'done') showToast('Posted ✓');
+  else if (g.status === 'waiting') showToast('Waiting for Approval');
+  
+  if (sessionMode) scrollToNextPending();
+}
 
-                <!-- Live Dynamic Operational Trace Logging Terminal -->
-                <div class="bg-primary-container text-primary-fixed p-4 rounded-xl font-mono text-xs space-y-1 h-40 overflow-y-auto custom-scrollbar shadow-inner" id="terminalLogs">
-                    <div class="text-on-primary-container opacity-40">// Live instance process trace logs will pipe here...</div>
-                </div>
+// ─── IMAGE UPLOAD HANDLING ───
+function handleImages(e) {
+  const files = Array.from(e.target.files);
+  selectedFiles = [...selectedFiles, ...files];
+  renderImagePreviews();
+}
 
-                <!-- Saved Deck Engine Carousel -->
-                <div class="space-y-stack-md">
-                    <div class="flex justify-between items-center px-2">
-                        <h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest">Saved Templates</h3>
-                        <button onclick="createNewTemplatePrompt()" class="text-primary font-label-sm flex items-center gap-1 hover:underline">
-                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span> New Template
-                        </button>
-                    </div>
-                    
-                    <div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x" id="templateDeck">
-                        <!-- Populated programmatically from JavaScript -->
-                    </div>
-                </div>
-            </div>
+function renderImagePreviews() {
+  const container = document.getElementById('imagePreviews');
+  container.innerHTML = '';
+  selectedFiles.forEach((file, index) => {
+    const url = URL.createObjectURL(file);
+    container.innerHTML += `
+      <div class="preview-wrapper">
+        <img src="${url}">
+        <button class="preview-remove" onclick="removeImage(${index})">✕</button>
+      </div>
+    `;
+  });
+}
 
-            <!-- Right Workspace Partition: Dynamic Aggregation Columns -->
-            <div class="lg:col-span-5 space-y-stack-lg">
-                <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(18,18,18,0.04)] border border-outline-variant/30 flex flex-col h-[700px]">
-                    
-                    <div class="p-6 border-b border-surface-variant space-y-4">
-                        <div class="flex justify-between items-center">
-                            <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Target Groups</h3>
-                            <span class="font-label-sm text-outline bg-surface-container px-2 py-0.5 rounded" id="selectionCountBadge">0 Selected</span>
-                        </div>
-                        <div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
-                            <span class="material-symbols-outlined text-outline" data-icon="search">search</span>
-                            <input id="directorySearch" oninput="renderGroups()" class="bg-transparent border-none text-body-sm focus:ring-0 w-full p-0" placeholder="Search groups..." type="text"/>
-                        </div>
-                        <div class="flex gap-2 overflow-x-auto pb-1 custom-scrollbar" id="filterTabRow">
-                            <button onclick="setFilter('all')" id="tab-all" class="bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap transition-all">All Groups</button>
-                            <button onclick="setFilter('pending')" id="tab-pending" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Waitlist</button>
-                            <button onclick="setFilter('done')" id="tab-done" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Sent</button>
-                            <button onclick="setFilter('failed')" id="tab-failed" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Failed</button>
-                        </div>
-                    </div>
+function removeImage(index) {
+  selectedFiles.splice(index, 1);
+  renderImagePreviews();
+}
 
-                    <!-- Target Directory Stack Feed -->
-                    <div class="flex-1 overflow-y-auto custom-scrollbar" id="groupList">
-                        <!-- Original Pre-Saved Facebook Groups are completely loaded here dynamically by the code script below -->
-                    </div>
+// ─── AUTOMATIC POSTER (RAILWAY CONNECT) ───
+async function checkServer() {
+  const url = document.getElementById('serverUrl').value.trim();
+  if (!url) { showToast('โปรดระบุ URL ของเซิร์ฟเวอร์'); return; }
+  const statusDiv = document.getElementById('serverStatus');
+  statusDiv.textContent = '🔄 Pinging...';
+  
+  try {
+    const res = await fetch(`${url}/status`);
+    const data = await res.json();
+    if (data.online) {
+      statusDiv.innerHTML = `🟢 Online ${data.running ? '(กำลังโพสต์ทำงานอยู่)' : '(พร้อมใช้งาน)'}`;
+      showToast('เชื่อมต่อเซิร์ฟเวอร์สำเร็จ');
+    }
+  } catch (e) {
+    statusDiv.textContent = '🔴 Offline (ไม่สามารถติดต่อเซิร์ฟเวอร์ได้)';
+    showToast('เชื่อมต่อล้มเหลว');
+  }
+}
 
-                    <div class="p-4 bg-surface-bright rounded-b-xl border-t border-surface-variant flex justify-between items-center">
-                        <button onclick="toggleSelectAllGroups()" class="text-xs text-secondary hover:text-primary transition-all flex items-center gap-1 font-medium">
-                            <span class="material-symbols-outlined text-sm" data-icon="checklist">checklist</span> Select All
-                        </button>
-                        <button onclick="resetAllStatuses()" class="text-xs text-outline hover:text-error transition-all flex items-center gap-1">
-                            <span class="material-symbols-outlined text-sm" data-icon="sync">sync</span> Reset Statuses
-                        </button>
-                    </div>
-                </div>
-            </div>
-        </div>
+async function startAutoPost() {
+  const url = document.getElementById('serverUrl').value.trim();
+  const caption = document.getElementById('postText').value;
+  
+  if (!url) { showToast('โปรดใส่ PC Server URL!'); return; }
+  const targetGroups = groups.filter(g => g.status === 'pending');
+  if (targetGroups.length === 0) { showToast('ไม่มีกลุ่มเหลือในคิว Pending!'); return; }
 
-        <!-- Float Master Action Tray Bar -->
-        <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[600px] z-50 transform translate-y-32 transition-all duration-500 ease-out" id="bulkBar">
-            <div class="bg-primary text-on-primary rounded-full px-8 py-4 shadow-2xl flex items-center justify-between gap-gutter">
-                <div class="flex items-center gap-stack-md">
-                    <span class="font-label-md" id="bulkCount">0 Groups Selected</span>
-                    <div class="w-[1px] h-4 bg-on-primary/30"></div>
-                    <span class="text-xs font-bold text-emerald-400" id="autoProgress">Ready to post</span>
-                </div>
-                <div class="flex items-center gap-2">
-                    <button class="p-2 hover:bg-white/10 rounded-full transition-colors" onclick="dismissFloatTray()"><span class="material-symbols-outlined" data-icon="close">close</span></button>
-                    <button onclick="executeCampaignBlast()" class="bg-on-primary text-primary px-6 py-2 rounded-full font-label-md hover:scale-105 transition-transform active:scale-95">Execute Blast</button>
-                </div>
-            </div>
-        </div>
-    </main>
+  const formData = new FormData();
+  formData.append('caption', caption);
+  formData.append('groups', JSON.stringify(targetGroups));
+  selectedFiles.forEach(file => formData.append('images', file));
 
-    <!-- Mobile Screen Interface Dock -->
-    <nav class="md:hidden fixed bottom-0 left-0 w-full z-50 flex justify-around items-center px-4 py-3 pb-safe bg-surface-container-lowest shadow-[0px_-4px_20px_rgba(18,18,18,0.04)] rounded-t-xl">
-        <div class="flex flex-col items-center justify-center bg-secondary-container text-on-secondary-container rounded-full px-4 py-1">
-            <span class="material-symbols-outlined" data-icon="dashboard">dashboard</span>
-            <span class="font-label-sm text-label-sm">Dashboard</span>
-        </div>
-        <div class="flex flex-col items-center justify-center text-on-surface-variant">
-            <span class="material-symbols-outlined" data-icon="layers">layers</span>
-            <span class="font-label-sm text-label-sm">Templates</span>
-        </div>
-        <div class="flex flex-col items-center justify-center text-on-surface-variant">
-            <span class="material-symbols-outlined" data-icon="history">history</span>
-            <span class="font-label-sm text-label-sm">History</span>
-        </div>
-    </nav>
+  showToast('🚀 กำลังเริ่มระบบสั่งโพสต์อัตโนมัติ...');
+  document.getElementById('autoPostBtn').style.display = 'none';
+  document.getElementById('autoStopBtn').style.display = 'block';
+  document.getElementById('autoProgress').style.display = 'block';
 
-    <!-- UI State Program Interactivity Scripts -->
-    <script>
-        let isSessionActive = false;
-        let groups = [];
-        let templates = [];
-        let selectedImages = [];
-        let currentFilter = 'all';
-        let serverMonitorInterval = null;
+  try {
+    const res = await fetch(`${url}/start-poster`, { method: 'POST', body: formData });
+    const data = await res.json();
+    if (data.ok) {
+      startSyncingProgress(url);
+    } else {
+      showToast('❌ เกิดข้อผิดพลาด: ' + data.error);
+      resetAutoPostUi();
+    }
+  } catch (e) {
+    showToast('❌ ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ Railway ได้');
+    resetAutoPostUi();
+  }
+}
 
-        // PREVIOUS LIVE PRE-SAVED FACEBOOK GROUPS SOURCE BACKUP RESTORED COMPLETELY
-        const initialGroupsSourceBackup = [
-            { id: "1", name: "นาฬิกามือสอง โพสต์ขายฟรี", url: "https://www.facebook.com/groups/watchsecondhand", status: "idle", checked: true },
-            { id: "2", name: "ซื้อขายนาฬิกาแบรนด์เนมแท้ มือสอง", url: "https://www.facebook.com/groups/brandnamewatch", status: "idle", checked: true },
-            { id: "3", name: "ตลาดซื้อขายนาฬิกา Luxury Watches Thailand", url: "https://www.facebook.com/groups/luxurywatchth", status: "idle", checked: true },
-            { id: "4", name: "ชมรมคนรักนาฬิกา Rolex & Patek", url: "https://www.facebook.com/groups/rolexpatekth", status: "idle", checked: true },
-            { id: "5", name: "Seiko & Citizen ซื้อขายแลกเปลี่ยน", url: "https://www.facebook.com/groups/seikothailand", status: "idle", checked: true },
-            { id: "6", name: "Apple Watch Thailand Market", url: "https://www.facebook.com/groups/applewatchth", status: "idle", checked: true },
-            { id: "7", name: "G-Shock & Streetwear ซื้อขาย", url: "https://www.facebook.com/groups/gshockmarket", status: "idle", checked: false },
-            { id: "8", name: "Vintage Watches ซื้อขายนาฬิกาวินเทจ", url: "https://www.facebook.com/groups/vintagewatchth", status: "idle", checked: false }
-        ];
+function startSyncingProgress(serverUrl) {
+  if (autoPostInterval) clearInterval(autoPostInterval);
+  
+  autoPostInterval = setInterval(async () => {
+    try {
+      const res = await fetch(`${serverUrl}/status`);
+      const data = await res.json();
+      
+      if (!data.online) return;
+      
+      const session = data.session || { done: 0, total: 0, groups: [] };
+      const done = session.done || 0;
+      const total = session.total || 0;
+      const p = total > 0 ? (done / total) * 100 : 0;
+      
+      document.getElementById('autoProgressBar').style.width = `${p}%`;
+      document.getElementById('autoProgressText').textContent = `กำลังโพสต์... สำเร็จแล้ว ${done} / ${total} กลุ่ม`;
 
-        const initialTemplatesSourceBackup = [
-            { id: "t1", tag: "Promo", text: "Flash Sale Alert! ⚡️ Use code SPRING20 for 20% off all items in the store today only." },
-            { id: "t2", tag: "Engagement", text: "Good morning everyone! Which product from the new collection is your absolute favorite? 👇" },
-            { id: "t3", tag: "Reminder", text: "Don't forget! The webinar starts in exactly 30 minutes. See you there!" }
-        ];
+      if (session.groups) {
+        document.getElementById('autoGroupList').innerHTML = session.groups.map(g => {
+          const icons = { done: '✅', failed: '❌', pending: '⏳' };
+          return `<div style="font-size:12px; display:flex; gap:6px;"><span>${icons[g.status]||'⏳'}</span><span>${g.name}</span></div>`;
+        }).join('');
 
-        window.addEventListener('DOMContentLoaded', () => {
-            loadConfigAndStorageData();
-            pingRemoteServerContext();
-            serverMonitorInterval = setInterval(pingRemoteServerContext, 5000);
-            
-            document.getElementById('postText').addEventListener('input', (e) => {
-                document.getElementById('charCounter').textContent = `${e.target.value.length} characters`;
-            });
+        // Sync สถานะความคืบหน้ากลับมาสู่เครื่องมือถือโลคอลด้วย
+        session.groups.forEach(serverGroup => {
+          if (serverGroup.status === 'done') {
+            const local = groups.find(g => g.id === serverGroup.id);
+            if (local && local.status !== 'done') {
+              local.status = 'done';
+            }
+          }
         });
+        saveData(); render();
+      }
 
-        function loadConfigAndStorageData() {
-            document.getElementById('railwayUrlInput').value = localStorage.getItem('pt_railway_url') || 'https://watch-autoposter-production.up.railway.app';
-            document.getElementById('secretKeyInput').value = localStorage.getItem('pt_secret_key') || 'mywatch2024';
-            
-            if(document.getElementById('railwayUrlInputMobile')) {
-                document.getElementById('railwayUrlInputMobile').value = document.getElementById('railwayUrlInput').value;
-                document.getElementById('secretKeyInputMobile').value = document.getElementById('secretKeyInput').value;
-            }
+      if (done >= total || !data.running) {
+        clearInterval(autoPostInterval);
+        document.getElementById('autoProgressText').textContent = `🎉 โพสต์อัตโนมัติเสร็จสิ้นครบทั้งหมดเรียบร้อย!`;
+        resetAutoPostUi();
+      }
+    } catch (e) { console.error('Progress sync err:', e); }
+  }, 2000);
+}
 
-            // Restore from LocalStorage or fall back to your restored group backup list safely
-            const storedGroups = localStorage.getItem('pt_groups_dataset');
-            if (storedGroups) {
-                groups = JSON.parse(storedGroups);
-                // Ensure if local storage was flushed or corrupted, we append backups safely
-                if (groups.length <= 3 && groups.some(g => g.name.includes("UX Research"))) {
-                    groups = initialGroupsSourceBackup;
-                }
-            } else {
-                groups = initialGroupsSourceBackup;
-            }
-            saveDatasetToLocalStorage();
+async function stopAutoPost() {
+  const url = document.getElementById('serverUrl').value.trim();
+  if (!url) return;
+  try {
+    await fetch(`${url}/stop-poster`, { method: 'POST' });
+    showToast('🛑 สั่งหยุดโพสต์เรียบร้อย');
+    clearInterval(autoPostInterval);
+    resetAutoPostUi();
+  } catch(e) { showToast('ไม่สามารถส่งคำสั่งหยุดได้'); }
+}
 
-            const storedTemplates = localStorage.getItem('pt_templates_dataset');
-            if (storedTemplates) {
-                templates = JSON.parse(storedTemplates);
-            } else {
-                templates = initialTemplatesSourceBackup;
-                localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
-            }
+function resetAutoPostUi() {
+  document.getElementById('autoPostBtn').style.display = 'block';
+  document.getElementById('autoStopBtn').style.display = 'none';
+}
 
-            renderGroups();
-            renderTemplates();
-            evaluateSelectionTrayState();
-        }
+// ─── SESSION HANDLERS ───
+function toggleSession() {
+  sessionMode = !sessionMode;
+  const btn = document.getElementById('sessionBtn');
+  const banner = document.getElementById('sessionBanner');
+  
+  btn.classList.toggle('session-active', sessionMode);
+  btn.textContent = sessionMode ? '🛑 Stop Session' : '▶ Start Session';
+  banner.classList.toggle('active', sessionMode);
+  
+  if (sessionMode) {
+    updateSessionBanner();
+    scrollToNextPending();
+  } else {
+    render();
+  }
+}
 
-        function saveConfig() {
-            localStorage.setItem('pt_railway_url', document.getElementById('railwayUrlInput').value.trim());
-            localStorage.setItem('pt_secret_key', document.getElementById('secretKeyInput').value.trim());
-            logTerminalEvent("⚙️ Network settings updated.");
-            pingRemoteServerContext();
-        }
+function updateSessionBanner() {
+  const totalPending = groups.filter(g => g.status === 'pending').length;
+  document.getElementById('sessionLabel').textContent = `เหลือกลุ่มรอโพสต์ในเซสชั่นนี้อีก: ${totalPending} กลุ่ม`;
+}
 
-        function syncConfig(sourceElement, targetId) {
-            document.getElementById(targetId).value = sourceElement.value;
-            saveConfig();
-        }
+function stopSession() {
+  if (sessionMode) toggleSession();
+}
 
-        function saveDatasetToLocalStorage() {
-            localStorage.setItem('pt_groups_dataset', JSON.stringify(groups));
-        }
+function scrollToNextPending() {
+  updateSessionBanner();
+  setTimeout(() => {
+    const nextEl = document.querySelector('.group-item.session-next');
+    if (nextEl) {
+      nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    } else if (sessionMode) {
+      showToast('🎉 เคลียร์เซสชั่นครบทุกกลุ่มแล้วครับ!');
+      toggleSession();
+    }
+  }, 100);
+}
 
-        function logTerminalEvent(msg) {
-            const container = document.getElementById('terminalLogs');
-            if (!container) return;
-            const logLine = document.createElement('div');
-            logLine.className = "py-0.5 border-b border-white/5";
-            logLine.innerHTML = `<span class="text-white/40">[${new Date().toLocaleTimeString()}]</span> <span class="text-primary-fixed-dim">${msg}</span>`;
-            container.appendChild(logLine);
-            container.scrollTop = container.scrollHeight;
-        }
+// ─── MULTI-SELECT BULK ACTIONS ───
+function toggleMultiSelect() {
+  multiSelectMode = !multiSelectMode;
+  selectedIds.clear();
+  const btn = document.getElementById('msBtn');
+  btn.classList.toggle('ms-active', multiSelectMode);
+  btn.textContent = multiSelectMode ? '✕ Cancel' : '☑ Select';
+  document.getElementById('groupList').classList.toggle('ms-mode', multiSelectMode);
+  document.getElementById('bulkBar').classList.toggle('visible', multiSelectMode);
+  updateBulkCount();
+  render();
+}
 
-        async function pingRemoteServerContext() {
-            const url = document.getElementById('railwayUrlInput').value.trim();
-            const indicator = document.getElementById('statusIndicator');
-            const txt = document.getElementById('statusText');
-            
-            if (!url) {
-                if (indicator) indicator.className = "w-2 h-2 rounded-full bg-amber-500";
-                if (txt) txt.textContent = "URL MISSING";
-                return;
-            }
+function toggleSelect(id) {
+  if (selectedIds.has(id)) selectedIds.delete(id);
+  else selectedIds.add(id);
+  updateBulkCount();
+}
 
-            try {
-                const response = await fetch(`${url}/status`).catch(e => { throw e; });
-                const data = await response.json();
-                
-                if (indicator) indicator.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
-                if (txt) txt.textContent = data.running ? "ACTIVE LIVE" : "CONNECTED";
+function bulkSelectAll() {
+  const visible = getVisible();
+  const allSelected = visible.every(g => selectedIds.has(g.id));
+  if (allSelected) visible.forEach(g => selectedIds.delete(g.id));
+  else visible.forEach(g => selectedIds.add(g.id));
+  updateBulkCount();
+  render();
+}
 
-                if (data.running) {
-                    document.getElementById('sessionBanner').classList.remove('hidden');
-                    if (data.session && data.session.groups) {
-                        syncRemoteExecutionStatuses(data.session.groups);
-                    }
-                } else {
-                    document.getElementById('sessionBanner').classList.add('hidden');
-                }
-            } catch (err) {
-                if (indicator) indicator.className = "w-2 h-2 rounded-full bg-rose-600";
-                if (txt) txt.textContent = "OFFLINE";
-            }
-        }
+function updateBulkCount() {
+  document.getElementById('bulkCount').textContent = selectedIds.size === 0 ? 'เลือกกลุ่มที่ต้องการ' : `เลือกแล้ว ${selectedIds.size} กลุ่ม`;
+}
 
-        function syncRemoteExecutionStatuses(serverGroups) {
-            let stateUpdated = false;
-            let finishedCount = 0;
+function bulkSetStatus(status) {
+  if (selectedIds.size === 0) { showToast('กรุณาเลือกกลุ่มก่อนครับ'); return; }
+  groups.forEach(g => { if (selectedIds.has(g.id)) g.status = status; });
+  selectedIds.clear();
+  saveData(); toggleMultiSelect(); render();
+  showToast('อัปเดตสถานะกลุ่มทั้งหมดเรียบร้อย');
+}
 
-            serverGroups.forEach(srvGroup => {
-                const localGroup = groups.find(g => g.url === srvGroup.url);
-                if (localGroup) {
-                    if (localGroup.status !== srvGroup.status) {
-                        localGroup.status = srvGroup.status;
-                        if (srvGroup.error) localGroup.errorMsg = srvGroup.error;
-                        if (srvGroup.status === 'done') localGroup.timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
-                        stateUpdated = true;
-                    }
-                }
-                if (srvGroup.status === 'done') finishedCount++;
-            });
+// ─── UTILITIES & CRUD ───
+function addGroup() {
+  const nameInput = document.getElementById('addInputName');
+  const linkInput = document.getElementById('addInputLink');
+  const name = nameInput.value.trim();
+  const link = linkInput.value.trim();
 
-            if (stateUpdated) {
-                saveDatasetToLocalStorage();
-                renderGroups();
-            }
+  if (!name) { showToast('โปรดใส่ชื่อกลุ่ม!'); return; }
+  
+  groups.push({ id: nextId++, name, note: '', link, status: 'pending' });
+  nameInput.value = ''; linkInput.value = '';
+  saveData(); render();
+  showToast('เพิ่มกลุ่มใหม่สำเร็จ ➕');
+}
 
-            const percentage = serverGroups.length ? Math.round((finishedCount / serverGroups.length) * 100) : 0;
-            document.getElementById('progressBar').style.width = `${percentage}%`;
-            document.getElementById('progressText').textContent = `${percentage}%`;
-        }
+function deleteGroup(id) {
+  if(confirm('คุณต้องการลบกลุ่มนี้ใช่หรือไม่?')) {
+    groups = groups.filter(g => g.id !== id);
+    saveData(); render();
+    showToast('ลบกลุ่มเรียบร้อย');
+  }
+}
 
-        async function executeCampaignBlast() {
-            const url = document.getElementById('railwayUrlInput').value.trim();
-            const secret = document.getElementById('secretKeyInput').value.trim();
-            const captionText = document.getElementById('postText').value.trim();
-            const targetedNodes = groups.filter(g => g.checked);
-            
-            if (!url) return alert("Please configure your Railway URL first.");
-            if (targetedNodes.length === 0) return alert("No target groups selected.");
-            if (!captionText && selectedImages.length === 0) return alert("Cannot send an empty blast configuration container.");
+function resetDone() {
+  groups.forEach(g => { if (g.status === 'done') g.status = 'pending'; });
+  saveData(); render(); showToast('รีเซ็ตกลุ่มที่สำเร็จเป็น Pending');
+}
 
-            logTerminalEvent(`🚀 Compiling content for [${targetedNodes.length}] groups...`);
-            
-            const payload = {
-                secret: secret,
-                caption: captionText,
-                images: selectedImages.map(img => img.base64Data), 
-                groups: targetedNodes.map(g => ({ id: g.id, name: g.name, url: g.url }))
-            };
+function markAllDone() {
+  groups.forEach(g => g.status = 'done');
+  saveData(); render(); showToast('เปลี่ยนทุกกลุ่มเป็น Posted ✓');
+}
 
-            try {
-                const res = await fetch(`${url}/start-post`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
+function resetAll() {
+  if (confirm('คุณต้องการรีเซ็ตข้อมูลกลุ่มและสเตตัสทั้งหมดกลับเป็นค่าเริ่มต้นใช่ไหม?')) {
+    localStorage.removeItem('watchGroupsV4');
+    groups = initGroups();
+    saveData(); render();
+    showToast('รีเซ็ตข้อมูลเริ่มต้นเรียบร้อย');
+  }
+}
 
-                const reply = await res.json();
-                if (res.ok && reply.ok) {
-                    logTerminalEvent("✅ Sequence successfully pushed to remote engine pipeline.");
-                    targetedNodes.forEach(g => { g.status = 'pending'; delete g.errorMsg; });
-                    saveDatasetToLocalStorage();
-                    renderGroups();
-                    pingRemoteServerContext();
-                } else {
-                    throw new Error(reply.error || "Server handshake failure");
-                }
-            } catch (err) {
-                logTerminalEvent(`❌ Process connection trace failure: ${err.message}`);
-                alert(`Engine error trace: ${err.message}`);
-            }
-        }
+function copyText() {
+  const txt = document.getElementById('postText');
+  if (!txt.value.trim()) { showToast('ไม่มีข้อความให้คัดลอก'); return; }
+  txt.select(); txt.setSelectionRange(0, 99999);
+  navigator.clipboard.writeText(txt.value).then(() => {
+    const btn = document.getElementById('copyBtn');
+    btn.textContent = 'Copied! ✓'; btn.classList.add('copied');
+    showToast('คัดลอกคำบรรยาย (Caption) เรียบร้อย');
+    setTimeout(() => { btn.textContent = 'Copy Caption'; btn.classList.remove('copied'); }, 1500);
+  });
+}
 
-        async function stopPosterSession() {
-            const url = document.getElementById('railwayUrlInput').value.trim();
-            const secret = document.getElementById('secretKeyInput').value.trim();
-            if (!confirm("Stop current backend engine workflow completely?")) return;
+function copyTpl(id, btn) {
+  const val = document.getElementById(id).value;
+  if (!val.trim()) { showToast('เทมเพลตนี้ไม่มีข้อความ'); return; }
+  navigator.clipboard.writeText(val).then(() => {
+    const oldText = btn.textContent;
+    btn.textContent = 'Copied!'; btn.classList.add('copied');
+    showToast('คัดลอกเทมเพลตเรียบร้อย');
+    setTimeout(() => { btn.textContent = oldText; btn.classList.remove('copied'); }, 1500);
+  });
+}
 
-            try {
-                const res = await fetch(`${url}/stop-post`, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ secret })
-                });
-                const reply = await res.json();
-                if (reply.ok) {
-                    logTerminalEvent("🛑 Remote engine forcefully terminated.");
-                    pingRemoteServerContext();
-                }
-            } catch (e) {
-                logTerminalEvent(`Error passing halt signal: ${e.message}`);
-            }
-        }
+function showToast(msg) {
+  const toast = document.getElementById('toast');
+  toast.textContent = msg; toast.classList.add('show');
+  setTimeout(() => toast.classList.remove('show'), 2500);
+}
 
-        function renderGroups() {
-            const targetContainer = document.getElementById('groupList');
-            const searchVal = document.getElementById('directorySearch').value.toLowerCase();
-            if (!targetContainer) return;
-            targetContainer.innerHTML = '';
-
-            const processedFilteredSet = groups.filter(g => {
-                const queryMatch = g.name.toLowerCase().includes(searchVal) || g.url.toLowerCase().includes(searchVal);
-                if (!queryMatch) return false;
-                if (currentFilter === 'all') return true;
-                return g.status === currentFilter;
-            });
-
-            if (processedFilteredSet.length === 0) {
-                targetContainer.innerHTML = `<div class="p-8 text-center text-xs text-outline font-mono">No target directories match your filter configurations.</div>`;
-                return;
-            }
-
-            processedFilteredSet.forEach(g => {
-                let badgeMarkup = '';
-                let opacityStyle = '';
-
-                if (g.status === 'done') {
-                    badgeMarkup = `<span class="status-emerald text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Sent ${g.timestamp || ''}</span>`;
-                    opacityStyle = 'opacity-75';
-                } else if (g.status === 'failed') {
-                    badgeMarkup = `<span class="status-error bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase" title="${g.errorMsg || ''}">Failed</span>`;
-                } else if (g.status === 'pending') {
-                    badgeMarkup = `
-                        <span class="status-amber text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Waitlist</span>
-                        <span class="flex items-center gap-1 text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-secondary-fixed animate-pulse">ROUTING</span>
-                    `;
-                } else {
-                    badgeMarkup = `<span class="status-gray text-[10px] font-bold px-2 py-0.5 rounded-full uppercase">Idle</span>`;
-                }
-
-                const itemHTML = `
-                    <div class="group p-4 border-b border-surface-variant/50 hover:bg-surface-bright flex items-center justify-between transition-colors ${opacityStyle}">
-                        <div class="flex items-center gap-4 min-w-0 flex-1 mr-2">
-                            <div class="w-10 h-10 shrink-0 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant text-secondary">
-                                <span class="material-symbols-outlined" data-icon="forum">forum</span>
-                            </div>
-                            <div class="min-w-0 flex-1">
-                                <p class="font-label-md text-label-md text-primary truncate">${g.name}</p>
-                                <div class="flex flex-wrap items-center gap-2 mt-0.5">
-                                    ${badgeMarkup}
-                                    <a href="${g.url}" target="_blank" class="text-[10px] text-outline hover:underline truncate max-w-[200px] font-mono">${g.url}</a>
-                                </div>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-2 shrink-0">
-                            <input type="checkbox" ${g.checked ? 'checked' : ''} onchange="toggleGroupNodeSelection('${g.id}')" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer">
-                        </div>
-                    </div>
-                `;
-                targetContainer.insertAdjacentHTML('beforeend', itemHTML);
-            });
-        }
-
-        function setFilter(metric) {
-            currentFilter = metric;
-            document.querySelectorAll('#filterTabRow button').forEach(btn => {
-                btn.className = "bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all";
-            });
-            const activeTab = document.getElementById(`tab-${metric}`);
-            if (activeTab) activeTab.className = "bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap transition-all";
-            renderGroups();
-        }
-
-        function toggleGroupNodeSelection(id) {
-            const index = groups.findIndex(g => g.id === id);
-            if (index !== -1) {
-                groups[index].checked = !groups[index].checked;
-                saveDatasetToLocalStorage();
-                evaluateSelectionTrayState();
-            }
-        }
-
-        function toggleSelectAllGroups() {
-            const anyUnchecked = groups.some(g => !g.checked);
-            groups.forEach(g => g.checked = anyUnchecked);
-            saveDatasetToLocalStorage();
-            renderGroups();
-            evaluateSelectionTrayState();
-        }
-
-        function resetAllStatuses() {
-            groups.forEach(g => { g.status = 'idle'; delete g.errorMsg; delete g.timestamp; });
-            saveDatasetToLocalStorage();
-            renderGroups();
-            document.getElementById('progressBar').style.width = '0%';
-            document.getElementById('progressText').textContent = '0%';
-            logTerminalEvent("🔄 Storage logs clear and statuses reset.");
-        }
-
-        function evaluateSelectionTrayState() {
-            const totalSelected = groups.filter(g => g.checked).length;
-            if(document.getElementById('selectionCountBadge')) document.getElementById('selectionCountBadge').textContent = `${totalSelected} Selected`;
-            if(document.getElementById('bulkCount')) document.getElementById('bulkCount').textContent = `${totalSelected} Groups Selected`;
-            
-            const bar = document.getElementById('bulkBar');
-            if (totalSelected > 0) {
-                bar.classList.remove('translate-y-32');
-            } else {
-                bar.classList.add('translate-y-32');
-            }
-        }
-
-        function dismissFloatTray() {
-            document.getElementById('bulkBar').classList.add('translate-y-32');
-        }
-
-        // Local Image Media Management Submodules
-        const imgInput = document.getElementById('imageInput');
-        const previewsWrapper = document.getElementById('imagePreviews');
-
-        if(imgInput) {
-            imgInput.addEventListener('change', (e) => {
-                const files = Array.from(e.target.files);
-                files.forEach(file => {
-                    if (!file.type.startsWith('image/')) return;
-                    const reader = new FileReader();
-                    reader.onload = (event) => {
-                        const trackingId = `img_${Date.now()}_${Math.random().toString(36).substring(2,5)}`;
-                        selectedImages.push({ id: trackingId, base64Data: event.target.result });
-                        
-                        const div = document.createElement('div');
-                        div.id = trackingId;
-                        div.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-outline-variant bg-surface';
-                        div.innerHTML = `
-                            <img src="${event.target.result}" class="w-full h-full object-cover">
-                            <button onclick="purgeAttachedImageFile('${trackingId}')" class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 flex items-center justify-center hover:bg-error transition-all">
-                                <span class="material-symbols-outlined text-[12px]">close</span>
-                            </button>
-                        `;
-                        previewsWrapper.appendChild(div);
-                        if(document.getElementById('mediaCountLabel')) document.getElementById('mediaCountLabel').textContent = `${selectedImages.length} ATTACHED MEDIA RELEASES`;
-                    };
-                    reader.readAsDataURL(file);
-                });
-            });
-        }
-
-        function purgeAttachedImageFile(id) {
-            selectedImages = selectedImages.filter(item => item.id !== id);
-            const targetElement = document.getElementById(id);
-            if (targetElement) targetElement.remove();
-            if(document.getElementById('mediaCountLabel')) document.getElementById('mediaCountLabel').textContent = selectedImages.length > 0 ? `${selectedImages.length} ATTACHED MEDIA RELEASES` : "Supports PNG, JPG, WEBP";
-        }
-
-        // Templates UI Logic Binder
-        function renderTemplates() {
-            const deck = document.getElementById('templateDeck');
-            if(!deck) return;
-            deck.innerHTML = '';
-            
-            templates.forEach(t => {
-                const layoutString = `
-                    <div class="min-w-[280px] max-w-[280px] snap-start bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/30 flex flex-col justify-between group hover:border-primary/30 transition-all cursor-pointer relative">
-                        <div>
-                            <div class="flex justify-between mb-3">
-                                <span class="text-[10px] font-bold uppercase text-outline bg-surface-container px-2 py-0.5 rounded font-mono">${t.tag}</span>
-                            </div>
-                            <p class="text-body-sm font-body-sm line-clamp-3 text-on-surface-variant">"${t.text}"</p>
-                        </div>
-                        <button class="mt-4 w-full py-2 bg-surface-container hover:bg-primary hover:text-on-primary text-primary text-label-sm font-label-sm rounded-lg transition-all" onclick="loadTemplateToComposer(this)">
-                            Copy to Composer
-                        </button>
-                    </div>
-                `;
-                deck.insertAdjacentHTML('beforeend', layoutString);
-            });
-        }
-
-        function loadTemplateToComposer(btn) {
-            const rawText = btn.previousElementSibling.querySelector('p').textContent.replace(/^"|"$/g, '');
-            document.getElementById('postText').value = rawText;
-            document.getElementById('charCounter').textContent = `${rawText.length} characters`;
-            logTerminalEvent("📋 Template extracted into workspace composer area.");
-        }
-
-        function createNewTemplatePrompt() {
-            const txt = document.getElementById('postText').value.trim();
-            if (!txt) return alert("Please type your content first.");
-            const tagInput = prompt("Enter tag category:", "Promo");
-            if (tagInput === null) return;
-            
-            templates.push({ id: `tpl_${Date.now()}`, tag: tagInput.trim() || "General", text: txt });
-            localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
-            renderTemplates();
-        }
-
-        function clearComposer() {
-            document.getElementById('postText').value = '';
-            document.getElementById('charCounter').textContent = '0 characters';
-            if(previewsWrapper) previewsWrapper.innerHTML = '';
-            selectedImages = [];
-            if(document.getElementById('mediaCountLabel')) document.getElementById('mediaCountLabel').textContent = "Supports PNG, JPG, WEBP";
-        }
-
-        function toggleSession() {
-            isSessionActive = !isSessionActive;
-            executeCampaignBlast();
-        }
-    </script>
+// INITIAL LOAD
+window.onload = () => {
+  loadData();
+  render();
+};
+</script>
 </body>
 </html>
