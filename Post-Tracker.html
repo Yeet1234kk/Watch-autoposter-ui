@@ -1,809 +1,813 @@
 <!DOCTYPE html>
-<html lang="th">
+<html class="light" lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>Post-Tracker</title>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Serif+Display&family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
-<style>
-  :root {
-    --bg: #f5f4f0;
-    --surface: #ffffff;
-    --card: #ffffff;
-    --border: #e8e6e1;
-    --border-soft: #f0ede8;
-
-    --text: #1a1916;
-    --text-mid: #7a7672;
-    --text-dim: #b0ada8;
-
-    --approved-bg: #1a1916;
-    --approved-text: #ffffff;
-    --approved-card: #f7f6f4;
-    --approved-dot: #1a1916;
-
-    --waiting-bg: #fff8ee;
-    --waiting-text: #c07a20;
-    --waiting-border: #f0d0a0;
-    --waiting-card: #fffcf7;
-    --waiting-dot: #e09040;
-
-    --pending-dot: #d8d4cd;
-    --r: 16px;
-    --r-sm: 8px;
-    --r-full: 99px;
-  }
-
-  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-  body {
-    font-family: 'DM Sans', 'Sarabun', sans-serif;
-    background: var(--bg);
-    color: var(--text);
-    padding-bottom: 120px;
-    line-height: 1.4;
-  }
-
-  .header {
-    background: var(--bg);
-    padding: 20px 16px 12px;
-    position: sticky;
-    top: 0;
-    z-index: 100;
-  }
-  .brand-sub { font-size: 11px; font-weight: 600; color: var(--text-dim); letter-spacing: 0.5px; text-transform: uppercase; margin-bottom: 2px; }
-  .brand-row { display: flex; justify-content: space-between; align-items: flex-end; }
-  .brand-title { font-family: 'DM Serif Display', serif; font-size: 26px; font-weight: 400; color: var(--text); line-height: 1; }
-  
-  .top-actions { display: flex; gap: 6px; }
-  .reset-btn {
-    background: transparent; border: 1px solid var(--border); color: var(--text-mid);
-    padding: 6px 12px; border-radius: var(--r-full); font-size: 11px; font-weight: 500; cursor: pointer;
-  }
-  .reset-btn:active { background: rgba(0,0,0,0.03); }
-
-  .main-card {
-    background: var(--surface);
-    border-radius: var(--r);
-    padding: 16px;
-    margin: 0 16px 16px;
-    border: 1px solid var(--border-soft);
-  }
-
-  .card-title { font-size: 14px; font-weight: 600; margin-bottom: 12px; color: var(--text-mid); }
-  .input-group { display: flex; gap: 8px; margin-bottom: 12px; }
-  .input-flat {
-    flex: 1; background: var(--bg); border: 1px solid transparent;
-    padding: 10px 14px; border-radius: var(--r-sm); font-family: inherit; font-size: 14px; color: var(--text);
-    outline: none; transition: all 0.2s;
-  }
-  .input-flat:focus { border-color: var(--text-dim); background: var(--surface); }
-  
-  .btn-action {
-    background: var(--text); color: var(--surface); border: none;
-    padding: 0 16px; border-radius: var(--r-sm); font-size: 13px; font-weight: 500; cursor: pointer;
-  }
-  .btn-action:active { opacity: 0.8; }
-
-  .status-indicator { font-size: 12px; font-weight: 500; color: var(--text-mid); display: flex; align-items: center; gap: 4px; }
-
-  .composer-box { display: flex; flex-direction: column; gap: 10px; }
-  .textarea-flat {
-    width: 100%; height: 100px; background: var(--bg); border: 1px solid transparent;
-    padding: 12px; border-radius: var(--r-sm); font-family: inherit; font-size: 14px; color: var(--text);
-    resize: none; outline: none; transition: all 0.2s;
-  }
-  .textarea-flat:focus { border-color: var(--text-dim); background: var(--surface); }
-
-  .composer-actions { display: flex; justify-content: space-between; align-items: center; }
-  .media-btn-wrap { position: relative; display: inline-block; }
-  .file-input-hidden { position: absolute; left: 0; top: 0; opacity: 0; width: 100%; height: 100%; cursor: pointer; }
-  .btn-secondary {
-    background: transparent; border: 1px solid var(--border); color: var(--text-mid);
-    padding: 8px 14px; border-radius: var(--r-full); font-size: 13px; font-weight: 500; cursor: pointer;
-    display: flex; align-items: center; gap: 6px;
-  }
-  .btn-secondary:active { background: rgba(0,0,0,0.02); }
-
-  .btn-primary {
-    background: #1a1a1a; color: #fff; border: none;
-    padding: 8px 16px; border-radius: var(--r-full); font-size: 13px; font-weight: 500; cursor: pointer;
-  }
-  .btn-primary:disabled { background: var(--text-dim); cursor: not-allowed; }
-
-  .tpl-deck { display: flex; gap: 8px; overflow-x: auto; padding: 4px 16px 12px; scrollbar-width: none; }
-  .tpl-deck::-webkit-scrollbar { display: none; }
-  .tpl-card {
-    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--r-sm);
-    padding: 12px; min-width: 150px; flex-shrink: 0; display: flex; flex-direction: column; gap: 8px;
-  }
-  .tpl-label { font-size: 11px; font-weight: 600; color: var(--text-dim); text-transform: uppercase; }
-  .tpl-input {
-    width: 100%; background: var(--bg); border: none; padding: 6px 8px; border-radius: 4px;
-    font-size: 12px; font-family: inherit; color: var(--text); outline: none;
-  }
-  .tpl-btn-row { display: flex; gap: 4px; }
-  .tpl-mini-btn {
-    flex: 1; background: transparent; border: 1px solid var(--border); color: var(--text-mid);
-    padding: 4px 0; border-radius: 4px; font-size: 10px; font-weight: 500; cursor: pointer; text-align: center;
-  }
-
-  .sticky-filter-bar {
-    position: sticky; top: 68px; z-index: 90; background: var(--bg);
-    padding: 4px 16px 12px; display: flex; justify-content: space-between; align-items: center;
-  }
-  .filter-tabs { display: flex; background: rgba(0,0,0,0.04); padding: 2px; border-radius: var(--r-full); }
-  .filter-tab {
-    background: transparent; border: none; color: var(--text-mid);
-    padding: 6px 14px; border-radius: var(--r-full); font-size: 12px; font-weight: 500; cursor: pointer;
-  }
-  .filter-tab.active { background: var(--surface); color: var(--text); font-weight: 600; box-shadow: 0 1px 3px rgba(0,0,0,0.05); }
-
-  .ms-btn {
-    background: transparent; border: 1px solid var(--border); color: var(--text-mid);
-    padding: 5px 12px; border-radius: var(--r-full); font-size: 11px; font-weight: 500; cursor: pointer;
-  }
-  .ms-btn.ms-active { background: var(--text); color: var(--surface); border-color: var(--text); }
-
-  .progress-section { padding: 0 16px 12px; }
-  .progress-meta { display: flex; justify-content: space-between; font-size: 12px; font-weight: 500; color: var(--text-mid); margin-bottom: 6px; }
-  .track-bg { width: 100%; height: 4px; background: rgba(0,0,0,0.05); border-radius: var(--r-full); overflow: hidden; }
-  .track-fill { height: 100%; width: 0%; background: var(--text); transition: width 0.3s ease; }
-
-  .list-container { padding: 0 16px; display: flex; flex-direction: column; gap: 10px; }
-  
-  .group-item {
-    background: var(--surface); border: 1px solid var(--border-soft); border-radius: var(--r);
-    overflow: hidden; transition: all 0.2s;
-  }
-  
-  .group-main { padding: 14px 14px; display: flex; align-items: center; gap: 10px; position: relative; cursor: pointer; }
-  .status-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--pending-dot); flex-shrink: 0; }
-  .group-info { flex: 1; min-width: 0; }
-  .group-name { font-size: 14px; font-weight: 500; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-  .group-note { font-size: 11px; color: #b86060; margin-top: 1px; font-weight: 400; }
-  .group-badge {
-    font-size: 11px; font-weight: 600; padding: 3px 8px; border-radius: var(--r-full);
-    background: rgba(0,0,0,0.04); color: var(--text-mid);
-  }
-
-  .group-actions {
-    display: flex; gap: 1px; background: var(--border-soft); border-top: 1px solid var(--border-soft);
-  }
-  .group-action-btn {
-    flex: 1; background: var(--surface); border: none; padding: 10px 0;
-    font-size: 11px; font-weight: 500; color: var(--text-mid); cursor: pointer;
-  }
-  .group-action-btn:active { background: var(--bg); }
-  .btn-post-mark { color: #2e66d4; font-weight: 600; background: #fafdff; }
-
-  .status-done .status-dot { background: var(--text); }
-  .status-done .group-item { background: var(--approved-card); }
-  .status-done .group-badge { background: var(--approved-bg); color: var(--approved-text); }
-  .status-done .btn-post { background: #f5f5f5; color: var(--text); font-weight: 600; }
-
-  .status-waiting .status-dot { background: var(--waiting-dot); }
-  .status-waiting .group-badge { background: var(--waiting-bg); color: var(--waiting-text); }
-  .status-waiting .btn-wait { background: var(--waiting-bg); color: var(--waiting-text); font-weight: 600; }
-
-  .ms-checkbox {
-    width: 16px; height: 16px; border: 1px solid var(--border); border-radius: 4px;
-    display: none; align-items: center; justify-content: center; font-size: 11px; font-weight: bold; color: #fff; flex-shrink: 0;
-  }
-  .ms-mode .ms-checkbox { display: flex; }
-  .ms-mode .status-dot { display: none; }
-  .ms-selected { border-color: var(--text); background: #fafafa; }
-  .ms-selected .ms-checkbox { background: var(--text); border-color: var(--text); }
-
-  .session-banner {
-    display: none; background: #1a1916; color: #fff; padding: 10px 16px;
-    justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 110; font-size: 13px;
-  }
-  .session-banner.active { display: flex; }
-  .session-next { border: 2px solid var(--text); box-shadow: 0 4px 12px rgba(0,0,0,0.06); }
-  .session-badge {
-    background: var(--text); color: #fff; font-size: 9px; font-weight: 700;
-    padding: 2px 5px; border-radius: 4px; text-transform: uppercase; letter-spacing: 0.5px;
-  }
-
-  .bulk-bar {
-    position: fixed; bottom: 0; left: 0; right: 0; background: var(--surface);
-    border-top: 1px solid var(--border); padding: 12px 16px cubic-bezier(0.1, 1, 0.1, 1);
-    transform: translateY(100%); transition: transform 0.25s; z-index: 200;
-    display: flex; justify-content: space-between; align-items: center; box-shadow: 0 -4px 16px rgba(0,0,0,0.04);
-  }
-  .bulk-bar.visible { transform: translateY(0); }
-  .bulk-info { font-size: 13px; font-weight: 500; }
-  .bulk-ops { display: flex; gap: 6px; }
-  .btn-bulk-act {
-    border: 1px solid var(--border); background: var(--surface); color: var(--text);
-    padding: 6px 12px; border-radius: var(--r-full); font-size: 12px; font-weight: 500; cursor: pointer;
-  }
-  .btn-bulk-act.primary { background: var(--text); color: var(--surface); border-color: var(--text); }
-
-  .empty-state { text-align: center; padding: 40px 20px; color: var(--text-dim); font-size: 13px; }
-  .toast {
-    position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(20px);
-    background: #1a1916; color: #ffffff; padding: 8px 16px; border-radius: var(--r-full);
-    font-size: 12px; font-weight: 500; opacity: 0; pointer-events: none; transition: all 0.2s; z-index: 300;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-  }
-  .toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
-  
-  .automation-status-panel {
-    background: #faf9f5; border: 1px dashed var(--border); border-radius: var(--r-sm);
-    padding: 10px; margin-top: 10px; display: none;
-  }
-</style>
+    <meta charset="utf-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <title>PostTracker - Editorial Dashboard</title>
+    
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400..700;1,9..40,400..700&family=DM+Serif+Display:ital@0;1&display=swap" rel="stylesheet"/>
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+    
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <script id="tailwind-config">
+        tailwind.config = {
+          darkMode: "class",
+          theme: {
+            extend: {
+              "colors": {
+                "surface-bright": "#fbf9f8",
+                "on-primary": "#ffffff",
+                "on-surface": "#1b1c1c",
+                "secondary-fixed-dim": "#c6c6c7",
+                "background": "#fbf9f8",
+                "secondary-container": "#dfe0e0",
+                "secondary-fixed": "#e2e2e2",
+                "surface-variant": "#e4e2e2",
+                "error-container": "#ffdad6",
+                "primary-fixed-dim": "#c8c6c5",
+                "on-secondary-fixed-variant": "#454747",
+                "on-error-container": "#93000a",
+                "surface-dim": "#dbdad9",
+                "error": "#ba1a1a",
+                "on-surface-variant": "#444748",
+                "primary": "#000000",
+                "surface-container-highest": "#e4e2e2",
+                "inverse-surface": "#303031",
+                "on-primary-fixed": "#1c1b1b",
+                "surface-container-low": "#f5f3f3",
+                "surface": "#fbf9f8",
+                "on-secondary": "#ffffff",
+                "on-secondary-container": "#616363",
+                "on-primary-fixed-variant": "#474646",
+                "surface-tint": "#5f5e5e",
+                "on-secondary-fixed": "#1a1c1c",
+                "primary-fixed": "#e5e2e1",
+                "tertiary-fixed-dim": "#c7c7c3",
+                "primary-container": "#1c1b1b",
+                "surface-container": "#efeded",
+                "inverse-primary": "#c8c6c5",
+                "on-error": "#ffffff",
+                "outline": "#747878",
+                "on-tertiary-fixed-variant": "#464744",
+                "on-primary-container": "#858383",
+                "on-tertiary": "#ffffff",
+                "secondary": "#5d5f5f",
+                "on-tertiary-fixed": "#1b1c1a",
+                "surface-container-lowest": "#ffffff",
+                "outline-variant": "#c4c7c7",
+                "tertiary": "#000000",
+                "tertiary-fixed": "#e3e2df",
+                "surface-container-high": "#e9e8e7",
+                "tertiary-container": "#1b1c1a",
+                "on-tertiary-container": "#848481",
+                "on-background": "#1b1c1c",
+                "inverse-on-surface": "#f2f0f0"
+              },
+              "borderRadius": {
+                "DEFAULT": "0.25rem",
+                "lg": "0.5rem",
+                "xl": "0.75rem",
+                "full": "9999px"
+              },
+              "spacing": {
+                "container-max": "1280px",
+                "stack-sm": "8px",
+                "gutter": "24px",
+                "stack-lg": "32px",
+                "margin-mobile": "16px",
+                "margin-desktop": "40px",
+                "stack-md": "16px",
+                "unit": "8px",
+                "section-gap": "64px"
+              },
+              "fontFamily": {
+                "body-sm": ["DM Sans"],
+                "display-lg-mobile": ["DM Serif Display"],
+                "body-md": ["DM Sans"],
+                "body-lg": ["DM Sans"],
+                "headline-sm": ["DM Serif Display"],
+                "label-md": ["DM Sans"],
+                "label-sm": ["DM Sans"],
+                "display-lg": ["DM Serif Display"],
+                "headline-md": ["DM Serif Display"]
+              },
+              "fontSize": {
+                "body-sm": ["14px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "display-lg-mobile": ["32px", {"lineHeight": "1.2", "fontWeight": "400"}],
+                "body-md": ["16px", {"lineHeight": "1.5", "fontWeight": "400"}],
+                "body-lg": ["18px", {"lineHeight": "1.6", "fontWeight": "400"}],
+                "headline-sm": ["24px", {"lineHeight": "1.3", "fontWeight": "400"}],
+                "label-md": ["14px", {"lineHeight": "1.2", "letterSpacing": "0.02em", "fontWeight": "600"}],
+                "label-sm": ["12px", {"lineHeight": "1.2", "letterSpacing": "0.05em", "fontWeight": "700"}],
+                "display-lg": ["48px", {"lineHeight": "1.1", "letterSpacing": "-0.02em", "fontWeight": "400"}],
+                "headline-md": ["32px", {"lineHeight": "1.2", "fontWeight": "400"}]
+              }
+            },
+          },
+        }
+    </script>
+    <style>
+        .material-symbols-outlined {
+            font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24;
+            display: inline-block;
+            vertical-align: middle;
+        }
+        .status-emerald { background-color: rgba(16, 185, 129, 0.1); color: #10b981; }
+        .status-amber { background-color: rgba(245, 158, 11, 0.1); color: #f59e0b; }
+        .status-gray { background-color: rgba(156, 163, 175, 0.1); color: #6b7280; }
+        
+        .custom-scrollbar::-webkit-scrollbar { width: 4px; height: 4px; }
+        .custom-scrollbar::-webkit-scrollbar-track { background: transparent; }
+        .custom-scrollbar::-webkit-scrollbar-thumb { background: #e5e2e1; border-radius: 10px; }
+        
+        #progressBar { transition: width 0.5s cubic-bezier(0.4, 0, 0.2, 1); }
+        body { min-height: max(884px, 100dvh); }
+    </style>
 </head>
-<body>
+<body class="bg-background text-on-background font-body-md min-h-screen pb-24 md:pb-0">
 
-<div id="sessionBanner" class="session-banner">
-  <span id="sessionLabel" style="font-weight:500;">Session Active</span>
-  <button onclick="stopSession()" style="background:transparent;border:none;color:#ff8888;font-size:12px;font-weight:600;cursor:pointer;">Stop Session</button>
-</div>
-
-<div class="header">
-  <div class="brand-sub">Watch Group Tracker</div>
-  <div class="brand-row">
-    <h1 class="brand-title">Dashboard</h1>
-    <div class="top-actions">
-      <button class="reset-btn" id="sessionBtn" onclick="toggleSession()">▶ Start Session</button>
-      <button class="reset-btn" onclick="resetDone()">Reset Post</button>
-      <button class="reset-btn" onclick="resetAll()">Clear Board</button>
-    </div>
-  </div>
-</div>
-
-<div class="main-card">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-    <div class="card-title" style="margin-bottom:0;">Server Gateway Engine</div>
-    <div id="serverStatus" class="status-indicator">🔴 Offline</div>
-  </div>
-  <div class="input-group">
-    <input type="text" id="serverUrl" class="input-flat" placeholder="https://your-server.railway.app" oninput="saveServerUrl()">
-    <button class="btn-action" id="pingBtn" onclick="checkServer()">Ping</button>
-  </div>
-</div>
-
-<div class="main-card">
-  <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:12px;">
-    <div class="card-title" style="margin-bottom:0;">Universal Post Composer</div>
-    <button class="reset-btn" onclick="clearCaption()">Clear Text</button>
-  </div>
-  <div class="composer-box">
-    <textarea id="postText" class="textarea-flat" placeholder="พิมพ์ข้อความโพสต์ตรงนี้..."></textarea>
-    
-    <div id="imageDropZone" style="border: 1px dashed var(--border); padding: 12px; text-align: center; border-radius: 8px; font-size: 12px; color: var(--text-mid);">
-      No images selected
-    </div>
-    <div id="imagePreviews" style="display:flex; gap:8px; overflow-x:auto; margin-bottom:4px;"></div>
-
-    <div class="composer-actions">
-      <div style="display:flex; gap:6px;">
-        <div class="media-btn-wrap">
-          <button class="btn-secondary">🖼️ Gallery</button>
-          <input type="file" id="imageInput" class="file-input-hidden" multiple accept="image/*" onchange="handleImages(event)">
+    <header class="fixed top-0 w-full z-50 flex justify-between items-center px-4 md:px-margin-desktop h-16 bg-surface border-b border-surface-variant">
+        <div class="flex items-center gap-stack-sm">
+            <span class="material-symbols-outlined text-primary" data-icon="hub">hub</span>
+            <h1 class="font-headline-sm text-[20px] md:text-headline-sm font-bold text-primary">PostTracker</h1>
         </div>
-        <button class="btn-secondary" onclick="clearImages()">🗑️ Clear Pics</button>
-        <button class="btn-secondary" onclick="copyText()">📋 Copy Text</button>
-      </div>
-      <div style="display:flex; gap:6px;">
-        <button class="btn-primary" id="autoStopBtn" style="background:#c05050; display:none;" onclick="stopAutoPost()">■ Stop</button>
-        <button class="btn-primary" id="autoPostBtn" onclick="startAutoPost()">🚀 Start Auto-Post</button>
-      </div>
-    </div>
-    
-    <div id="autoProgress" class="automation-status-panel">
-      <div id="autoProgressText" style="font-size:12px; font-weight:600; margin-bottom:4px;">Automation Active...</div>
-      <div class="track-bg" style="height:6px; margin-bottom:8px;"><div id="autoProgressBar" class="track-fill" style="background:#3a7d52; width:0%;"></div></div>
-      <div id="autoGroupList" style="max-height:80px; overflow-y:auto;"></div>
-    </div>
-  </div>
-</div>
-
-<div class="tpl-deck">
-  <div class="tpl-card">
-    <div class="tpl-label">Header Tag</div>
-    <input type="text" id="headerText" class="tpl-input" placeholder="✨ มัดรวมสเปคเด็ด..." oninput="saveTpl()">
-    <div class="tpl-btn-row">
-      <button class="tpl-mini-btn" onclick="copyTpl('headerText', this)">Copy</button>
-      <button class="tpl-mini-btn" onclick="clearTemplate('headerText')">Clear</button>
-    </div>
-  </div>
-  <div class="tpl-card">
-    <div class="tpl-label">Group Chat Link</div>
-    <input type="text" id="groupChatText" class="tpl-input" placeholder="https://openchat..." oninput="saveTpl()">
-    <div class="tpl-btn-row">
-      <button class="tpl-mini-btn" onclick="copyTpl('groupChatText', this)">Copy</button>
-      <button class="tpl-mini-btn" onclick="clearTemplate('groupChatText')">Clear</button>
-    </div>
-  </div>
-  <div class="tpl-card">
-    <div class="tpl-label">Line Contact</div>
-    <input type="text" id="lineText" class="tpl-input" placeholder="ID: @supwatch" oninput="saveTpl()">
-    <div class="tpl-btn-row">
-      <button class="tpl-mini-btn" onclick="copyTpl('lineText', this)">Copy</button>
-      <button class="tpl-mini-btn" onclick="clearTemplate('lineText')">Clear</button>
-    </div>
-  </div>
-</div>
-
-<div class="main-card" style="padding:12px 14px; margin-bottom:12px;">
-  <div class="card-title" style="margin-bottom:8px; font-size:12px;">Add Custom Targeted Group</div>
-  <div style="display:flex; flex-direction:column; gap:6px;">
-    <input type="text" id="addInputName" class="input-flat" placeholder="ชื่อกลุ่มภาษาไทยหรืออังกฤษ" style="padding:8px 12px; font-size:13px;">
-    <div class="input-group" style="margin-bottom:0;">
-      <input type="text" id="addInputLink" class="input-flat" placeholder="https://www.facebook.com/share/g/..." style="padding:8px 12px; font-size:13px;">
-      <button class="btn-action" onclick="addGroup()" style="font-size:12px; padding:0 14px;">+ Add</button>
-    </div>
-  </div>
-</div>
-
-<div class="sticky-filter-bar">
-  <div class="filter-tabs">
-    <button class="filter-tab tab-all active" onclick="setFilter('all')">All (<span id="countAll">0</span>)</button>
-    <button class="filter-tab tab-approved" onclick="setFilter('done')">Posted (<span id="countDone">0</span>)</button>
-    <button class="filter-tab tab-waiting" onclick="setFilter('waiting')">Waiting (<span id="countWaiting">0</span>)</button>
-  </div>
-  <button class="ms-btn" id="msBtn" onclick="toggleMultiSelect()">☑ Select</button>
-</div>
-
-<div class="progress-section">
-  <div class="progress-meta">
-    <span>Campaign Completion</span>
-    <span id="progressText">0 / 0</span>
-  </div>
-  <div class="track-bg"><div id="progressBar" class="track-fill"></div></div>
-</div>
-
-<div class="list-container" id="groupList"></div>
-
-<div class="bulk-bar" id="bulkBar">
-  <div class="bulk-info" id="bulkCount">0 selected</div>
-  <div class="bulk-ops">
-    <button class="btn-bulk-act" onclick="bulkSelectAll()">Select All</button>
-    <button class="btn-bulk-act" onclick="bulkSetStatus('waiting')">Set Waiting</button>
-    <button class="btn-bulk-act primary" onclick="bulkSetStatus('done')">Set Posted</button>
-  </div>
-</div>
-
-<div id="toast" class="toast">Action Complete</div>
-
-<script>
-const defaultGroups = [
-  { id: 1, name: "ซื้อ-ขายแลกเปลี่ยนนาฬิกา R watch", note: "ห้ามใส่ลิ้งค์ ใส่ id @ supwatch แทน", link: "https://www.facebook.com/share/g/1Cxe1beqhf/" },
-  { id: 2, name: "นาฬิกามือสอง โพสต์ขายฟรี", note: "", link: "https://www.facebook.com/share/g/1LM4n7tACt/" },
-  { id: 3, name: "นาฬิกามือสอง ออนไลน์", note: "", link: "https://www.facebook.com/share/g/1BLdJnsk1t/" },
-  { id: 4, name: "HRPT Watches Market Thailand", note: "", link: "https://www.facebook.com/share/g/1EMjs9g928/" },
-  { id: 5, name: "HRPT Thailand Market Talks", note: "", link: "https://www.facebook.com/share/g/1L91xTVgTB/?mibextid=wwXIfr" },
-  { id: 6, name: "ซื้อ-ขาย นาฬิกาเกรด Rep แบรนด์ทุกยี่ห้อ", note: "", link: "https://www.facebook.com/share/g/18pHWWZQYT/" },
-  { id: 7, name: "นาฬิกา มือสองทุกรุ่น", note: "", link: "https://www.facebook.com/share/g/1C9JwAgCTD/" },
-  { id: 8, name: "ขายนาฬิกามือ1และมือ2 ทุกแบรนไม่จำกัดราคา", note: "", link: "https://www.facebook.com/share/g/1FviQkkkbq/" },
-  { id: 9, name: "กลุ่มซื้อ-ขาย นาฬิกามือสอง ทุกรุ่น", note: "", link: "https://www.facebook.com/share/g/1BUsYAiXop/" }
-];
-
-let groups = [];
-let nextId = 100;
-let currentFilter = 'all';
-let sessionMode = false;
-let multiSelectMode = false;
-let selectedIds = new Set();
-let selectedImages = [];
-let autoPostInterval = null;
-
-// ─── DATA CORE ───
-function loadData() {
-  try {
-    const saved = localStorage.getItem('watchGroupsV4');
-    const savedPost = localStorage.getItem('postText');
-    if (saved) {
-      const p = JSON.parse(saved);
-      groups = p.groups || initGroups();
-      nextId = p.nextId || 100;
-    } else {
-      groups = initGroups();
-    }
-    if (savedPost) document.getElementById('postText').value = savedPost;
-  } catch(e) { groups = initGroups(); }
-}
-
-function initGroups() {
-  return defaultGroups.map(g => ({ ...g, status: 'pending' }));
-}
-
-function saveData() {
-  localStorage.setItem('watchGroupsV4', JSON.stringify({ groups, nextId }));
-  localStorage.setItem('postText', document.getElementById('postText').value);
-}
-
-// ─── MANUAL ACTION BUTTON HOOKS ───
-function clearCaption() {
-  document.getElementById('postText').value = '';
-  saveData();
-  showToast('Caption cleared');
-}
-
-function clearImages() {
-  selectedImages = [];
-  document.getElementById('imageInput').value = '';
-  document.getElementById('imagePreviews').innerHTML = '';
-  document.getElementById('imageDropZone').style.display = 'block';
-  showToast('Images cleared');
-}
-
-function clearTemplate(id) {
-  document.getElementById(id).value = '';
-  saveTpl();
-  showToast('Template cleared');
-}
-
-function setFilter(f) {
-  currentFilter = f;
-  document.querySelectorAll('.filter-tab').forEach(btn => btn.classList.remove('active'));
-  const map = { all: 'tab-all', done: 'tab-approved', waiting: 'tab-waiting' };
-  document.querySelector('.' + map[f])?.classList.add('active');
-  render();
-}
-
-function launchLink(id) {
-  const g = groups.find(x => x.id === id);
-  if (!g) return;
-  const text = document.getElementById('postText').value;
-  if (text.trim()) {
-    navigator.clipboard.writeText(text).catch(() => {});
-    showToast('Copied & opening group ↗');
-  } else {
-    showToast('Opening group ↗');
-  }
-  if (g.status === 'pending') g.status = 'waiting';
-  saveData(); render();
-  if (g.link) window.open(g.link, '_blank');
-}
-
-function handleGroupMainClick(id) {
-  if (multiSelectMode) { toggleSelect(id); return; }
-  const g = groups.find(x => x.id === id);
-  if (!g) return;
-  g.status = (g.status === 'done') ? 'pending' : 'done';
-  saveData(); render();
-}
-
-function setStatus(id, status) {
-  const g = groups.find(x => x.id === id);
-  if (!g) return;
-  g.status = (g.status === status) ? 'pending' : status;
-  saveData(); render();
-  if (sessionMode) scrollToNextPending();
-}
-
-// ─── BULK EDITING ───
-function toggleMultiSelect() {
-  multiSelectMode = !multiSelectMode;
-  selectedIds.clear();
-  const btn = document.getElementById('msBtn');
-  btn.classList.toggle('ms-active', multiSelectMode);
-  btn.textContent = multiSelectMode ? '✕ Cancel' : '☑ Select';
-  document.getElementById('groupList').classList.toggle('ms-mode', multiSelectMode);
-  document.getElementById('bulkBar').classList.toggle('visible', multiSelectMode);
-  updateBulkCount();
-  render();
-}
-
-function toggleSelect(id) {
-  if (selectedIds.has(id)) selectedIds.delete(id);
-  else selectedIds.add(id);
-  updateBulkCount();
-  render();
-}
-
-function bulkSelectAll() {
-  const visible = getVisible();
-  const allSelected = visible.every(g => selectedIds.has(g.id));
-  visible.forEach(g => allSelected ? selectedIds.delete(g.id) : selectedIds.add(g.id));
-  updateBulkCount(); render();
-}
-
-function bulkSetStatus(status) {
-  if (selectedIds.size === 0) return;
-  groups.forEach(g => { if (selectedIds.has(g.id)) g.status = status; });
-  selectedIds.clear();
-  saveData(); render(); updateBulkCount();
-  showToast('Statuses updated');
-}
-
-function updateBulkCount() {
-  document.getElementById('bulkCount').textContent = `${selectedIds.size} selected`;
-}
-
-// ─── SEMI-AUTO SEMANTIC SESSIONS ───
-function toggleSession() {
-  sessionMode = !sessionMode;
-  const btn = document.getElementById('sessionBtn');
-  const banner = document.getElementById('sessionBanner');
-  if (sessionMode) {
-    btn.textContent = '■ End Session';
-    btn.classList.add('session-active');
-    banner.classList.add('active');
-    render(); scrollToNextPending();
-  } else { stopSession(); }
-}
-
-function stopSession() {
-  sessionMode = false;
-  document.getElementById('sessionBtn').textContent = '▶ Start Session';
-  document.getElementById('sessionBtn').classList.remove('session-active');
-  document.getElementById('sessionBanner').classList.remove('active');
-  render();
-}
-
-function getNextPending() { return groups.find(g => g.status === 'pending') || null; }
-function scrollToNextPending() {
-  setTimeout(() => {
-    const nextEl = document.querySelector('.group-item.session-next');
-    if (nextEl) nextEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
-  }, 100);
-}
-
-// ─── RENDERING MECHANICS ───
-function getVisible() { return currentFilter === 'all' ? groups : groups.filter(g => g.status === currentFilter); }
-function render() {
-  const list = document.getElementById('groupList');
-  const done = groups.filter(g => g.status === 'done').length;
-  const waiting = groups.filter(g => g.status === 'waiting').length;
-  const total = groups.length;
-
-  document.getElementById('progressText').textContent = `${done} / ${total}`;
-  document.getElementById('progressBar').style.width = total ? (done / total * 100) + '%' : '0%';
-  document.getElementById('countAll').textContent = total;
-  document.getElementById('countDone').textContent = done;
-  document.getElementById('countWaiting').textContent = waiting;
-
-  if (sessionMode) {
-    document.getElementById('sessionLabel').textContent = `Session — ${done} of ${total} posted`;
-  }
-
-  const nextPendingId = sessionMode ? (getNextPending()?.id ?? null) : null;
-  const visible = getVisible();
-
-  if (visible.length === 0) {
-    list.innerHTML = `<div class="empty-state">No groups match this filter</div>`;
-    return;
-  }
-
-  list.innerHTML = visible.map(g => {
-    const isDone = g.status === 'done';
-    const isWait = g.status === 'waiting';
-    const isNext = g.id === nextPendingId;
-    const isSelected = selectedIds.has(g.id);
-    return `
-    <div class="group-item status-${g.status} ${isNext ? 'session-next' : ''} ${isSelected ? 'ms-selected' : ''}">
-      <div class="group-main" onclick="handleGroupMainClick(${g.id})">
-        <div class="ms-checkbox">${isSelected ? '✓' : ''}</div>
-        <div class="status-dot"></div>
-        <div class="group-info">
-          <div class="group-name">${g.name}</div>
-          ${g.note ? `<div class="group-note">${g.note}</div>` : ''}
+        
+        <div class="flex items-center gap-4">
+            <input id="railwayUrlInput" type="text" placeholder="https://your-railway.app" onchange="saveConfig()" class="hidden md:block text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-64 focus:ring-1 focus:ring-primary">
+            <input id="secretKeyInput" type="password" placeholder="Secret Key" onchange="saveConfig()" class="hidden md:block text-xs bg-surface-container-low border-outline-variant rounded-lg px-3 py-1 w-32 focus:ring-1 focus:ring-primary">
         </div>
-        ${isNext ? `<span class="session-badge">Next</span>` : ''}
-        <div class="group-badge">${isDone ? 'Posted' : isWait ? 'Waiting' : 'Pending'}</div>
-      </div>
-      <div class="group-actions">
-        ${g.link ? `<button class="group-action-btn btn-post-mark" onclick="launchLink(${g.id}); event.stopPropagation();">เปิด & โพสต์ ↗</button>` : ''}
-        <button class="group-action-btn btn-post ${isDone ? 'active-post' : ''}" onclick="setStatus(${g.id}, 'done'); event.stopPropagation();">โพสต์แล้ว</button>
-        <button class="group-action-btn btn-wait ${isWait ? 'active-wait' : ''}" onclick="setStatus(${g.id}, 'waiting'); event.stopPropagation();">รออนุมัติ</button>
-        <button class="group-action-btn btn-delete-item" onclick="deleteGroup(${g.id}); event.stopPropagation();">ลบ</button>
-      </div>
-    </div>`;
-  }).join('');
-}
 
-function deleteGroup(id) {
-  if (confirm('ลบกลุ่มนี้?')) { groups = groups.filter(x => x.id !== id); saveData(); render(); }
-}
-function addGroup() {
-  const nInput = document.getElementById('addInputName');
-  const lInput = document.getElementById('addInputLink');
-  if (!nInput.value.trim()) return;
-  groups.push({ id: nextId++, name: nInput.value.trim(), note: '', link: lInput.value.trim(), status: 'pending' });
-  nInput.value = ''; lInput.value = ''; saveData(); render();
-}
-function resetDone() { groups.forEach(g => g.status = 'pending'); saveData(); render(); }
-function markAllDone() { groups.forEach(g => g.status = 'done'); saveData(); render(); }
-function resetAll() { if (confirm('Reset Board?')) { groups = initGroups(); nextId = 100; saveData(); render(); } }
-function copyText() {
-  navigator.clipboard.writeText(document.getElementById('postText').value);
-  showToast('Copied text!');
-}
-function saveTpl() {
-  localStorage.setItem('tpl_header', document.getElementById('headerText').value);
-  localStorage.setItem('tpl_groupchat', document.getElementById('groupChatText').value);
-  localStorage.setItem('tpl_line', document.getElementById('lineText').value);
-}
-function loadTpl() {
-  document.getElementById('headerText').value = localStorage.getItem('tpl_header') || '';
-  document.getElementById('groupChatText').value = localStorage.getItem('tpl_groupchat') || '';
-  document.getElementById('lineText').value = localStorage.getItem('tpl_line') || '';
-}
-function copyTpl(id, btn) { navigator.clipboard.writeText(document.getElementById(id).value); showToast('Copied Template'); }
+        <div class="flex items-center gap-stack-md">
+            <div class="flex items-center gap-2 px-3 py-1 rounded-full bg-surface-container-low text-label-sm font-label-sm" id="serverStatus">
+                <span id="statusIndicator" class="w-2 h-2 rounded-full bg-gray-400"></span> 
+                <span id="statusText">CHECKING</span>
+            </div>
+            <button class="bg-primary text-on-primary px-4 py-2 rounded-lg font-label-md text-label-md hover:opacity-90 transition-all" id="newGroupBtn" onclick="openAddGroupModal()">
+                Add Group
+            </button>
+        </div>
+    </header>
 
-let tTimer;
-function showToast(m) {
-  const t = document.getElementById('toast'); t.textContent = m; t.classList.add('show');
-  clearTimeout(tTimer); tTimer = setTimeout(() => t.classList.remove('show'), 2000);
-}
+    <main class="pt-24 pb-12 px-4 md:px-margin-desktop max-w-container-max mx-auto space-y-stack-lg">
+        
+        <section class="grid grid-cols-1 md:hidden gap-2 p-4 bg-surface-container-low rounded-xl">
+            <label class="text-[11px] font-bold uppercase text-secondary">Railway Server Endpoint Connection</label>
+            <input id="railwayUrlInputMobile" type="text" placeholder="https://your-railway.app" oninput="syncConfig(this, 'railwayUrlInput')" class="text-sm bg-surface-container-lowest border-outline-variant rounded-lg p-2 focus:ring-primary">
+            <input id="secretKeyInputMobile" type="password" placeholder="Secret Password" oninput="syncConfig(this, 'secretKeyInput')" class="text-sm bg-surface-container-lowest border-outline-variant rounded-lg p-2 focus:ring-primary">
+        </section>
 
-// ─── SERVER INTERACTION ───
-function saveServerUrl() { localStorage.setItem('serverUrl', document.getElementById('serverUrl').value); }
-function loadServerUrl() { document.getElementById('serverUrl').value = localStorage.getItem('serverUrl') || ''; }
-function getServerUrl() { return (document.getElementById('serverUrl').value || '').replace(/\/$/, ''); }
+        <section class="space-y-stack-md">
+            <div class="flex flex-col md:flex-row justify-between items-baseline gap-2">
+                <h2 class="font-display-lg text-display-lg-mobile md:text-display-lg">Watch Group Tracker</h2>
+                <div class="flex items-center gap-stack-sm">
+                    <span class="font-label-md text-label-md text-on-surface-variant" id="runtimeStatusLabel">Queue Completion</span>
+                    <span class="font-label-md text-label-md text-primary" id="progressText">0%</span>
+                </div>
+            </div>
+            <div class="w-full h-2 bg-surface-container rounded-full overflow-hidden">
+                <div class="h-full bg-primary w-0" id="progressBar"></div>
+            </div>
+            
+            <div class="hidden bg-primary-container text-on-primary-container p-4 rounded-xl flex justify-between items-center" id="sessionBanner">
+                <div class="flex items-center gap-stack-md">
+                    <span class="material-symbols-outlined animate-spin text-primary-fixed" data-icon="sync">sync</span>
+                    <span class="font-label-md text-white" id="liveActivityBannerText">Background posting engine running via Railway...</span>
+                </div>
+                <button class="bg-error px-4 py-1 rounded-lg text-white font-label-sm hover:opacity-90 transition-all" onclick="stopPosterSession()">Emergency Stop</button>
+            </div>
+        </section>
 
-async function checkServer() {
-  const url = getServerUrl();
-  if (!url) return;
-  document.getElementById('pingBtn').textContent = '...';
-  try {
-    const res = await fetch(`${url}/status`, { signal: AbortSignal.timeout(4000) });
-    const data = await res.json();
-    document.getElementById('serverStatus').textContent = data.online ? '🟢 Connected' : '🔴 Server Issue';
-  } catch { document.getElementById('serverStatus').textContent = '🔴 Offline'; }
-  document.getElementById('pingBtn').textContent = 'Ping';
-}
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-gutter items-start">
+            
+            <div class="lg:col-span-7 space-y-stack-lg">
+                <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(18,18,18,0.04)] border border-outline-variant/30 overflow-hidden">
+                    <div class="p-6 border-b border-surface-variant flex justify-between items-center">
+                        <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Universal Post Composer</h3>
+                        <button onclick="clearComposer()" class="text-xs text-secondary hover:text-error transition-all">Clear Form</button>
+                    </div>
+                    <div class="p-6 space-y-stack-md">
+                        <textarea class="w-full min-h-[160px] p-4 bg-surface-container-low border-none focus:ring-1 focus:ring-primary rounded-lg font-body-md text-body-md resize-none placeholder:text-on-surface-variant/50 transition-all" id="postText" placeholder="Write watch specifications, price details, reference numbers, or promo tags..."></textarea>
+                        
+                        <div class="relative group cursor-pointer" id="imageDropZone">
+                            <div class="flex flex-col items-center justify-center p-6 bg-surface-bright border-2 border-dashed border-outline-variant rounded-xl group-hover:border-primary group-hover:bg-surface-container transition-all">
+                                <span class="material-symbols-outlined text-3xl text-outline mb-2" data-icon="add_photo_alternate">add_photo_alternate</span>
+                                <p class="font-label-md text-label-md text-on-surface-variant text-center">Drop watch media assets or click to navigate folders</p>
+                                <p class="text-[10px] uppercase mt-1 text-outline" id="mediaCountLabel">No attachments staged</p>
+                            </div>
+                            <input accept="image/*" class="absolute inset-0 opacity-0 cursor-pointer" id="imageInput" multiple type="file"/>
+                        </div>
+                        <div class="flex flex-wrap gap-2" id="imagePreviews"></div>
+                        
+                        <div class="flex justify-between items-center pt-4 border-t border-surface-variant">
+                            <div class="flex gap-2">
+                                <span class="text-xs text-outline bg-surface-container px-3 py-1.5 rounded-md font-mono" id="charCounter">0 characters</span>
+                            </div>
+                            <button class="flex items-center gap-2 bg-primary text-on-primary px-6 py-2.5 rounded-lg font-label-md hover:opacity-90 transition-all shadow-md active:scale-98" id="autoPostBtn" onclick="executeCampaignBlast()">
+                                <span class="material-symbols-outlined text-sm" data-icon="rocket_launch">rocket_launch</span> Execute Sequence Blast
+                            </button>
+                        </div>
+                    </div>
+                </div>
 
-function compressImage(file) {
-  return new Promise((resolve) => {
-    const reader = new FileReader();
-    reader.readAsDataURL(file);
-    reader.onload = (e) => {
-      const img = new Image();
-      img.src = e.target.result;
-      img.onload = () => {
-        const canvas = document.createElement('canvas');
-        let w = img.width, h = img.height;
-        if (w > h && w > 1600) { h *= 1600 / w; w = 1600; }
-        else if (h > 1600) { w *= 1600 / h; h = 1600; }
-        canvas.width = w; canvas.height = h;
-        canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-        canvas.toBlob((b) => resolve(new File([b], file.name, { type: 'image/jpeg' })), 'image/jpeg', 0.85);
-      };
-    };
-  });
-}
+                <div class="bg-primary-container text-primary-fixed p-4 rounded-xl font-mono text-xs space-y-1 h-48 overflow-y-auto custom-scrollbar shadow-inner" id="terminalLogs">
+                    <div class="text-on-primary-container opacity-40">// Live instance process trace logs will pipe here</div>
+                </div>
 
-async function handleImages(e) {
-  const files = Array.from(e.target.files);
-  if (!files.length) return;
-  showToast('⚡ Compressing...');
-  selectedImages = [];
-  for (let f of files) {
-    if (f.type.startsWith('image/')) { selectedImages.push(await compressImage(f)); }
-    else { selectedImages.push(f); }
-  }
-  const previews = document.getElementById('imagePreviews');
-  previews.innerHTML = '';
-  selectedImages.forEach((file, i) => {
-    const url = URL.createObjectURL(file);
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;width:70px;height:70px;flex-shrink:0;';
-    wrap.innerHTML = `<img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;" />
-      <button onclick="removeImage(${i}); event.stopPropagation();" style="position:absolute;top:-5px;right:-5px;background:#c05050;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;">✕</button>`;
-    previews.appendChild(wrap);
-  });
-  document.getElementById('imageDropZone').style.display = selectedImages.length ? 'none' : 'block';
-  showToast('Ready!');
-}
+                <div class="space-y-stack-md">
+                    <div class="flex justify-between items-center px-2">
+                        <h3 class="font-label-md text-label-md text-secondary uppercase tracking-widest">Pre-compiled Content Templates</h3>
+                        <button onclick="createNewTemplatePrompt()" class="text-primary font-label-sm flex items-center gap-1 hover:underline">
+                            <span class="material-symbols-outlined text-sm" data-icon="add">add</span> Save Current Context
+                        </button>
+                    </div>
+                    <div class="flex gap-4 overflow-x-auto pb-4 custom-scrollbar snap-x" id="templateDeck">
+                        </div>
+                </div>
+            </div>
 
-function removeImage(i) {
-  selectedImages.splice(i, 1);
-  const fakeEvent = { target: { files: [] } };
-  const previews = document.getElementById('imagePreviews');
-  previews.innerHTML = '';
-  selectedImages.forEach((file, idx) => {
-    const url = URL.createObjectURL(file);
-    const wrap = document.createElement('div');
-    wrap.style.cssText = 'position:relative;width:70px;height:70px;flex-shrink:0;';
-    wrap.innerHTML = `<img src="${url}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;" />
-      <button onclick="removeImage(${idx}); event.stopPropagation();" style="position:absolute;top:-5px;right:-5px;background:#c05050;color:#fff;border:none;border-radius:50%;width:18px;height:18px;font-size:10px;cursor:pointer;">✕</button>`;
-    previews.appendChild(wrap);
-  });
-  document.getElementById('imageDropZone').style.display = selectedImages.length ? 'none' : 'block';
-}
+            <div class="lg:col-span-5 space-y-stack-lg">
+                <div class="bg-surface-container-lowest rounded-xl shadow-[0px_4px_20px_rgba(18,18,18,0.04)] border border-outline-variant/30 flex flex-col h-[740px]">
+                    
+                    <div class="p-6 border-b border-surface-variant space-y-4">
+                        <div class="flex justify-between items-center">
+                            <h3 class="font-label-md text-label-md text-primary uppercase tracking-widest">Target Workspace Directories</h3>
+                            <span class="font-label-sm text-outline bg-surface-container px-2 py-0.5 rounded" id="selectionCountBadge">0 Staged</span>
+                        </div>
+                        <div class="flex items-center gap-2 bg-surface-container-low px-3 py-2 rounded-lg">
+                            <span class="material-symbols-outlined text-outline" data-icon="search">search</span>
+                            <input id="directorySearch" oninput="renderGroups()" class="bg-transparent border-none text-body-sm focus:ring-0 w-full p-0" placeholder="Filter directories by name or link..." type="text"/>
+                        </div>
+                        <div class="flex gap-1 overflow-x-auto pb-1 custom-scrollbar" id="filterTabRow">
+                            <button onclick="setFilter('all')" id="tab-all" class="bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap transition-all">All Groups</button>
+                            <button onclick="setFilter('pending')" id="tab-pending" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Staged</button>
+                            <button onclick="setFilter('done')" id="tab-done" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Dispatched</button>
+                            <button onclick="setFilter('failed')" id="tab-failed" class="bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all">Halted</button>
+                        </div>
+                    </div>
 
-// ─── SERVER DEPLOYMENT ENGINES ───
-async function startAutoPost() {
-  const url = getServerUrl();
-  const caption = document.getElementById('postText').value.trim();
-  if (!url || !caption) { showToast('Missing URL or Caption'); return; }
+                    <div class="flex-1 overflow-y-auto custom-scrollbar" id="groupList">
+                        </div>
 
-  let targetGroups = [];
-  if (selectedIds && selectedIds.size > 0) {
-    targetGroups = groups.filter(g => selectedIds.has(g.id) && g.link);
-  } else {
-    targetGroups = groups.filter(g => g.status === 'pending' && g.link);
-  }
+                    <div class="p-4 bg-surface-bright rounded-b-xl border-t border-surface-variant flex gap-2 justify-between">
+                        <button onclick="toggleSelectAllGroups()" class="text-xs text-secondary hover:text-primary transition-all flex items-center gap-1 font-medium">
+                            <span class="material-symbols-outlined text-sm" data-icon="checklist">checklist</span> Select/Deselect All
+                        </button>
+                        <button onclick="resetAllStatuses()" class="text-xs text-outline hover:text-error transition-all flex items-center gap-1">
+                            <span class="material-symbols-outlined text-sm" data-icon="restart_alt">restart_alt</span> Reset Status Traces
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
 
-  if (targetGroups.length === 0) { showToast('No pending targets'); return; }
+    <div class="fixed bottom-8 left-1/2 -translate-x-1/2 w-[90%] max-w-[600px] z-50 transform translate-y-32 transition-all duration-500 ease-out" id="bulkBar">
+        <div class="bg-primary text-on-primary rounded-full px-6 py-4 shadow-2xl flex items-center justify-between gap-4">
+            <div class="flex items-center gap-3">
+                <span class="font-label-md" id="bulkCount">0 Directories Chosen</span>
+                <div class="w-[1px] h-4 bg-on-primary/30"></div>
+                <span class="text-xs font-bold text-emerald-400" id="autoProgress">Staged Sequence Ready</span>
+            </div>
+            <div class="flex items-center gap-2">
+                <button class="p-1 hover:bg-white/10 rounded-full transition-colors" onclick="dismissFloatTray()"><span class="material-symbols-outlined text-sm" data-icon="close">close</span></button>
+                <button onclick="executeCampaignBlast()" class="bg-on-primary text-primary px-5 py-1.5 rounded-full font-label-md font-bold text-xs hover:scale-105 transition-transform">Execute Engine</button>
+            </div>
+        </div>
+    </div>
 
-  const formData = new FormData();
-  formData.append('caption', caption);
-  formData.append('groups', JSON.stringify(targetGroups.map(g => ({ id: g.id, name: g.name, link: g.link }))));
-  
-  if (selectedImages && selectedImages.length > 0) {
-    selectedImages.forEach(img => formData.append('images', img));
-  }
+    <div id="groupModal" class="hidden fixed inset-0 z-50 bg-black/40 backdrop-blur-sm flex items-center justify-center p-4">
+        <div class="bg-surface rounded-xl max-w-md w-full border border-surface-variant shadow-2xl p-6 space-y-4 animate-in fade-in zoom-in-95 duration-150">
+            <div class="flex justify-between items-center">
+                <h4 class="font-headline-sm text-lg font-bold text-primary">Register Target Group Node</h4>
+                <button onclick="closeAddGroupModal()" class="text-secondary hover:text-primary"><span class="material-symbols-outlined" data-icon="close">close</span></button>
+            </div>
+            <div class="space-y-3">
+                <div>
+                    <label class="text-xs font-bold uppercase text-secondary">Target Directory Label</label>
+                    <input id="modalGroupName" type="text" placeholder="e.g. Rolex Luxury Traders Marketplace" class="w-full mt-1 bg-surface-container-low border-outline-variant rounded-lg text-sm focus:ring-primary">
+                </div>
+                <div>
+                    <label class="text-xs font-bold uppercase text-secondary">Facebook Desktop Link URI</label>
+                    <input id="modalGroupUrl" type="text" placeholder="https://www.facebook.com/groups/xxxxx" class="w-full mt-1 bg-surface-container-low border-outline-variant rounded-lg text-sm focus:ring-primary">
+                </div>
+            </div>
+            <div class="flex justify-end gap-2 pt-2">
+                <button onclick="closeAddGroupModal()" class="px-4 py-2 bg-surface-container rounded-lg text-xs text-secondary font-medium">Cancel</button>
+                <button onclick="commitNewGroupNode()" class="px-4 py-2 bg-primary text-on-primary rounded-lg text-xs font-medium">Inject Entry</button>
+            </div>
+        </div>
+    </div>
 
-  const btn = document.getElementById('autoPostBtn');
-  btn.textContent = '⏳ Deploying...'; btn.disabled = true;
+    <script>
+        // Core Volatile Dynamic Local Store Memory Registers
+        let groups = [];
+        let templates = [];
+        let selectedImages = []; // Stores Base64 binary arrays parsed directly out from File API elements
+        let currentFilter = 'all';
+        let serverMonitorInterval = null;
 
-  try {
-    const res = await fetch(`${url}/start`, { method: 'POST', body: formData });
-    const data = await res.json();
-    if (!data.ok) throw new Error(data.error);
+        // Base Initial Defaults Engine Registry Configuration Matrix
+        const fallbackGroups = [
+            { id: "1", name: "นาฬิกามือสอง โพสต์ขายฟรี", url: "https://www.facebook.com/groups/watchsecondhand", status: "pending", checked: true },
+            { id: "2", name: "UX Research Collective Forum", url: "https://www.facebook.com/groups/uxresearch", status: "done", timestamp: "10:24 AM", checked: false },
+            { id: "3", name: "Tech Trends Weekly Marketplace", url: "https://www.facebook.com/groups/techtrends", status: "failed", errorMsg: "Selector timeout", checked: false }
+        ];
 
-    showToast('🚀 Running!');
-    document.getElementById('autoStopBtn').style.display = 'block';
-    document.getElementById('autoProgress').style.display = 'block';
-    if (typeof multiSelectMode !== 'undefined' && multiSelectMode) toggleMultiSelect();
-    
-    startProgressPolling(url, targetGroups.length);
-  } catch (err) {
-    showToast('❌ Error: ' + err.message);
-    btn.textContent = '🚀 Start Auto-Post'; btn.disabled = false;
-  }
-}
+        const fallbackTemplates = [
+            { id: "t1", tag: "Promo Asset", text: "Flash Sale Alert! ⚡️ Use code SPRING20 for 20% off all items in the store today only." },
+            { id: "t2", tag: "Engagement Link", text: "Good morning everyone! Which product from the new collection is your absolute favorite? 👇" },
+            { id: "t3", tag: "Broadcast Notice", text: "Don't forget! The watch verification auction starts in exactly 30 minutes. See you there!" }
+        ];
 
-function startProgressPolling(url, totalCount) {
-  clearInterval(autoPostInterval);
-  autoPostInterval = setInterval(async () => {
-    try {
-      const res = await fetch(`${url}/status`);
-      const data = await res.json();
-      
-      const done = data.session?.progress?.done || data.session?.done || 0;
-      const pct = totalCount ? (done / totalCount * 100) : 0;
-
-      document.getElementById('autoProgressBar').style.width = pct + '%';
-      document.getElementById('autoProgressText').textContent = `Automation: ${done} / ${totalCount} Done`;
-
-      const serverGroups = data.session?.groups || data.groups;
-      if (serverGroups) {
-        document.getElementById('autoGroupList').innerHTML = serverGroups.map(g => {
-          const color = g.status === 'done' ? '#3a7d52' : g.status === 'failed' ? '#c05050' : '#8a857c';
-          const sym = g.status === 'done' ? '✅' : g.status === 'failed' ? '❌' : '⏳';
-          return `<div style="font-size:12px;color:${color};margin-bottom:2px;">${sym} ${g.name}</div>`;
-        }).join('');
-
-        serverGroups.forEach(serverGroup => {
-          const local = groups.find(x => x.id === serverGroup.id);
-          if (local && serverGroup.status !== 'pending' && local.status !== serverGroup.status) {
-            local.status = serverGroup.status;
-            saveData();
-          }
+        // System Lifecycle Context Initialization Hooks
+        window.addEventListener('DOMContentLoaded', () => {
+            loadConfigAndStorageData();
+            pingRemoteServerContext();
+            serverMonitorInterval = setInterval(pingRemoteServerContext, 4000);
+            
+            // Register Textarea Tracking Interceptor
+            document.getElementById('postText').addEventListener('input', (e) => {
+                document.getElementById('charCounter').textContent = `${e.target.value.length} characters`;
+            });
         });
-        if (typeof render === 'function') render();
-      }
 
-      if (done >= totalCount || (!data.running && done > 0)) {
-        clearInterval(autoPostInterval);
-        document.getElementById('autoStopBtn').style.display = 'none';
-        document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post';
-        document.getElementById('autoPostBtn').disabled = false;
-        showToast('🎉 Session Completed!');
-      }
-    } catch (e) {}
-  }, 3500);
-}
+        function loadConfigAndStorageData() {
+            // Restore configuration values from browser LocalStorage
+            document.getElementById('railwayUrlInput').value = localStorage.getItem('pt_railway_url') || 'https://watch-autoposter-production.up.railway.app';
+            document.getElementById('secretKeyInput').value = localStorage.getItem('pt_secret_key') || 'mywatch2024';
+            
+            // Sync mobile context view engines mirroring structural endpoints
+            document.getElementById('railwayUrlInputMobile').value = document.getElementById('railwayUrlInput').value;
+            document.getElementById('secretKeyInputMobile').value = document.getElementById('secretKeyInput').value;
 
-async function stopAutoPost() {
-  try { await fetch(`${getServerUrl()}/stop`, { method: 'POST' }); } catch{}
-  clearInterval(autoPostInterval);
-  document.getElementById('autoStopBtn').style.display = 'none';
-  document.getElementById('autoProgress').style.display = 'none';
-  document.getElementById('autoPostBtn').textContent = '🚀 Start Auto-Post';
-  document.getElementById('autoPostBtn').disabled = false;
-}
+            // Load structured directory files database lists
+            const storedGroups = localStorage.getItem('pt_groups_dataset');
+            if (storedGroups) {
+                groups = JSON.parse(storedGroups);
+            } else {
+                groups = fallbackGroups;
+                saveDatasetToLocalStorage();
+            }
 
-document.getElementById('postText').addEventListener('input', saveData);
-loadData(); loadTpl(); loadServerUrl(); render();
-</script>
+            // Load dynamic structural contextual layout messaging matrices
+            const storedTemplates = localStorage.getItem('pt_templates_dataset');
+            if (storedTemplates) {
+                templates = JSON.parse(storedTemplates);
+            } else {
+                templates = fallbackTemplates;
+                localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
+            }
+
+            renderGroups();
+            renderTemplates();
+            evaluateSelectionTrayState();
+        }
+
+        function saveConfig() {
+            localStorage.setItem('pt_railway_url', document.getElementById('railwayUrlInput').value.trim());
+            localStorage.setItem('pt_secret_key', document.getElementById('secretKeyInput').value.trim());
+            logTerminalEvent("⚙️ Network connection configuration bindings modified.");
+            pingRemoteServerContext();
+        }
+
+        function syncConfig(sourceElement, targetId) {
+            document.getElementById(targetId).value = sourceElement.value;
+            saveConfig();
+        }
+
+        function saveDatasetToLocalStorage() {
+            localStorage.setItem('pt_groups_dataset', JSON.stringify(groups));
+        }
+
+        function logTerminalEvent(msg) {
+            const container = document.getElementById('terminalLogs');
+            const logLine = document.createElement('div');
+            logLine.className = "py-0.5 border-b border-white/5 last:border-0";
+            logLine.innerHTML = `<span class="text-white/40">[${new Date().toLocaleTimeString()}]</span> <span class="text-primary-fixed-dim">${msg}</span>`;
+            container.appendChild(logLine);
+            container.scrollTop = container.scrollHeight;
+        }
+
+        // Live Railway Node API Communication Pipeline Controls
+        async function pingRemoteServerContext() {
+            const url = document.getElementById('railwayUrlInput').value.trim();
+            const indicator = document.getElementById('statusIndicator');
+            const txt = document.getElementById('statusText');
+            
+            if (!url) {
+                indicator.className = "w-2 h-2 rounded-full bg-amber-500 animate-pulse";
+                txt.textContent = "MISSING ENDPOINT";
+                return;
+            }
+
+            try {
+                const response = await fetch(`${url}/status`, { method: 'GET' }).catch(e => { throw e; });
+                if (!response.ok) throw new Error("HTTP Handshake Failure");
+                
+                const data = await response.json();
+                
+                // Process dynamic state updates returned from headless system context tracking logs
+                indicator.className = "w-2 h-2 rounded-full bg-emerald-500 animate-pulse";
+                txt.textContent = data.running ? "ACTIVE ENGINE RUNNING" : "LIVE ACTIVE";
+
+                if (data.running) {
+                    document.getElementById('sessionBanner').classList.remove('hidden');
+                    document.getElementById('runtimeStatusLabel').textContent = "Remote Running Task Sync";
+                    
+                    // Parse target tracking collection groups array data payload elements from background session instance structures
+                    if (data.session && data.session.groups) {
+                        syncRemoteExecutionStatuses(data.session.groups);
+                    }
+                } else {
+                    document.getElementById('sessionBanner').classList.add('hidden');
+                    document.getElementById('runtimeStatusLabel').textContent = "Queue Completion";
+                }
+            } catch (err) {
+                indicator.className = "w-2 h-2 rounded-full bg-rose-600";
+                txt.textContent = "OFFLINE DISCONNECTED";
+            }
+        }
+
+        function syncRemoteExecutionStatuses(serverGroups) {
+            let contextModified = false;
+            let finishedCount = 0;
+
+            serverGroups.forEach(srvGroup => {
+                const localGroup = groups.find(g => g.id === srvGroup.id || g.url === srvGroup.url);
+                if (localGroup) {
+                    if (localGroup.status !== srvGroup.status) {
+                        localGroup.status = srvGroup.status;
+                        if (srvGroup.error) localGroup.errorMsg = srvGroup.error;
+                        if (srvGroup.status === 'done') localGroup.timestamp = new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'});
+                        contextModified = true;
+                    }
+                }
+                if (srvGroup.status === 'done') finishedCount++;
+            });
+
+            if (contextModified) {
+                saveDatasetToLocalStorage();
+                renderGroups();
+            }
+
+            const percentage = serverGroups.length ? Math.round((finishedCount / serverGroups.length) * 100) : 0;
+            document.getElementById('progressBar').style.width = `${percentage}%`;
+            document.getElementById('progressText').textContent = `${percentage}%`;
+        }
+
+        // Live Action Broadcast Engine Integration Method Execution Block
+        async function executeCampaignBlast() {
+            const url = document.getElementById('railwayUrlInput').value.trim();
+            const secret = document.getElementById('secretKeyInput').value.trim();
+            const captionText = document.getElementById('postText').value.trim();
+            
+            const targetedNodes = groups.filter(g => g.checked);
+            
+            if (!url) return alert("Please map a operational Railway Endpoint Domain URI target interface configuration entry.");
+            if (targetedNodes.length === 0) return alert("No active target group directories checked in storage deck stack queue.");
+            if (!captionText && selectedImages.length === 0) return alert("Cannot dispatch empty content context envelope payload container parameters.");
+
+            logTerminalEvent(`🚀 Compiling broadcast sequence package context frame payloads across [${targetedNodes.length}] nodes...`);
+            
+            // Format dynamic execution parameter matrix to pass straight onto Railway Node internal processing instances
+            const payload = {
+                secret: secret,
+                caption: captionText,
+                // Pass base64 data strings payload representation array if populated
+                images: selectedImages.map(img => img.base64Data), 
+                groups: targetedNodes.map(g => ({ id: g.id, name: g.name, url: g.url }))
+            };
+
+            try {
+                logTerminalEvent("Connecting to orchestration execution server at upstream framework path...");
+                const res = await fetch(`${url}/start-post`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                const reply = await res.json();
+                if (res.ok && reply.ok) {
+                    logTerminalEvent("✅ Sequence tracking execution signal successfully processed on remote engine instance loop context.");
+                    // Instantly switch targeted parameters into standard checking modes awaiting update interval synchronization loops
+                    targetedNodes.forEach(g => { g.status = 'pending'; delete g.errorMsg; });
+                    saveDatasetToLocalStorage();
+                    renderGroups();
+                    pingRemoteServerContext();
+                } else {
+                    throw new Error(reply.error || `Server responded with standard HTTP structural fault: ${res.status}`);
+                }
+            } catch (err) {
+                logTerminalEvent(`❌ Execution initialization pipeline failure event trace: ${err.message}`);
+                alert(`Pipeline initialization structural interface failure: ${err.message}`);
+            }
+        }
+
+        async function stopPosterSession() {
+            const url = document.getElementById('railwayUrlInput').value.trim();
+            const secret = document.getElementById('secretKeyInput').value.trim();
+            if (!confirm("Are you sure you want to stop the current posting session?")) return;
+
+            logTerminalEvent("🛑 Dispatching emergency shutdown sequence call command to task router worker runtime...");
+            try {
+                const res = await fetch(`${url}/stop-post`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ secret })
+                });
+                const reply = await res.json();
+                if (reply.ok) {
+                    logTerminalEvent("🛑 Remote engine loop context force terminated successfully. Queue flushed clean.");
+                    pingRemoteServerContext();
+                }
+            } catch (e) {
+                logTerminalEvent(`Error passing runtime halt signal trace: ${e.message}`);
+            }
+        }
+
+        // Structural Directories Rendering Interface Layer Methods
+        function renderGroups() {
+            const targetContainer = document.getElementById('groupList');
+            const searchVal = document.getElementById('directorySearch').value.toLowerCase();
+            targetContainer.innerHTML = '';
+
+            const processedFilteredSet = groups.filter(g => {
+                const queryMatch = g.name.toLowerCase().includes(searchVal) || g.url.toLowerCase().includes(searchVal);
+                if (!queryMatch) return false;
+                if (currentFilter === 'all') return true;
+                return g.status === currentFilter;
+            });
+
+            if (processedFilteredSet.length === 0) {
+                targetContainer.innerHTML = `<div class="p-8 text-center text-xs text-outline font-mono">No target directories intersect filter metrics context parameters</div>`;
+                return;
+            }
+
+            processedFilteredSet.forEach(g => {
+                let badgeMarkup = '';
+                let opacityStyle = '';
+
+                if (g.status === 'done') {
+                    badgeMarkup = `<span class="status-emerald text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Dispatched ${g.timestamp || ''}</span>`;
+                    opacityStyle = 'opacity-75';
+                } else if (g.status === 'failed') {
+                    badgeMarkup = `<span class="status-error bg-rose-100 text-rose-700 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter" title="${g.errorMsg || ''}">Halted: ${g.errorMsg || 'Error'}</span>`;
+                } else if (g.status === 'pending') {
+                    badgeMarkup = `
+                        <span class="status-amber text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Staged Queue</span>
+                        <span class="flex items-center gap-1 text-[10px] font-bold text-primary px-2 py-0.5 rounded-full bg-secondary-fixed animate-pulse"><span class="w-1.5 h-1.5 rounded-full bg-primary"></span> ROUTING</span>
+                    `;
+                } else {
+                    badgeMarkup = `<span class="status-gray text-[10px] font-bold px-2 py-0.5 rounded-full uppercase tracking-tighter">Idle Standby</span>`;
+                }
+
+                const itemHTML = `
+                    <div class="group-item p-4 border-b border-surface-variant/50 hover:bg-surface-bright flex items-center justify-between transition-colors ${opacityStyle}">
+                        <div class="flex items-center gap-4 min-w-0 flex-1 mr-2">
+                            <div class="w-10 h-10 shrink-0 rounded-full bg-surface-container flex items-center justify-center border border-outline-variant text-secondary">
+                                <span class="material-symbols-outlined" data-icon="forum">forum</span>
+                            </div>
+                            <div class="min-w-0 flex-1">
+                                <p class="font-label-md text-label-md text-primary truncate" title="${g.name}">${g.name}</p>
+                                <div class="flex flex-wrap items-center gap-2 mt-0.5">
+                                    ${badgeMarkup}
+                                    <a href="${g.url}" target="_blank" class="text-[10px] text-outline hover:underline truncate max-w-[150px] font-mono">${g.url}</a>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-2 shrink-0">
+                            <button onclick="removeGroupNode('${g.id}')" class="p-1 text-outline hover:text-error transition-all opacity-0 group-hover:opacity-100 focus:opacity-100"><span class="material-symbols-outlined text-sm" data-icon="delete">delete</span></button>
+                            <input type="checkbox" ${g.checked ? 'checked' : ''} onchange="toggleGroupNodeSelection('${g.id}')" class="w-5 h-5 rounded border-outline-variant text-primary focus:ring-primary cursor-pointer">
+                        </div>
+                    </div>
+                `;
+                targetContainer.insertAdjacentHTML('beforeend', itemHTML);
+            });
+        }
+
+        function setFilter(metric) {
+            currentFilter = metric;
+            document.querySelectorAll('#filterTabRow button').forEach(btn => {
+                btn.className = "bg-surface-container text-secondary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap hover:bg-secondary-container transition-all";
+            });
+            const activeTab = document.getElementById(`tab-${metric}`);
+            if (activeTab) activeTab.className = "bg-primary text-on-primary px-3 py-1 rounded-full text-label-sm font-label-sm whitespace-nowrap transition-all";
+            renderGroups();
+        }
+
+        function toggleGroupNodeSelection(id) {
+            const index = groups.findIndex(g => g.id === id);
+            if (index !== -1) {
+                groups[index].checked = !groups[index].checked;
+                saveDatasetToLocalStorage();
+                evaluateSelectionTrayState();
+            }
+        }
+
+        function toggleSelectAllGroups() {
+            const anyUnchecked = groups.some(g => !g.checked);
+            groups.forEach(g => g.checked = anyUnchecked);
+            saveDatasetToLocalStorage();
+            renderGroups();
+            evaluateSelectionTrayState();
+            logTerminalEvent(anyUnchecked ? "Checked all group targets" : "Unchecked all group targets");
+        }
+
+        function resetAllStatuses() {
+            groups.forEach(g => {
+                g.status = 'idle';
+                delete g.errorMsg;
+                delete g.timestamp;
+            });
+            saveDatasetToLocalStorage();
+            renderGroups();
+            updateProgress(0);
+            logTerminalEvent("🔄 Storage tracked execution status indices reset clean.");
+        }
+
+        function evaluateSelectionTrayState() {
+            const totalSelected = groups.filter(g => g.checked).length;
+            document.getElementById('selectionCountBadge').textContent = `${totalSelected} Staged`;
+            document.getElementById('bulkCount').textContent = `${totalSelected} Directories Chosen`;
+            
+            const bar = document.getElementById('bulkBar');
+            if (totalSelected > 0) {
+                bar.classList.remove('translate-y-32');
+            } else {
+                bar.classList.add('translate-y-32');
+            }
+        }
+
+        function dismissFloatTray() {
+            document.getElementById('bulkBar').classList.add('translate-y-32');
+        }
+
+        // Mutation Database Control Submodules
+        function openAddGroupModal() { document.getElementById('groupModal').classList.remove('hidden'); }
+        function closeAddGroupModal() {
+            document.getElementById('groupModal').classList.add('hidden');
+            document.getElementById('modalGroupName').value = '';
+            document.getElementById('modalGroupUrl').value = '';
+        }
+
+        function commitNewGroupNode() {
+            const name = document.getElementById('modalGroupName').value.trim();
+            const url = document.getElementById('modalGroupUrl').value.trim();
+            if (!name || !url) return alert("Please populate structural value fields prior to entry injection mapping.");
+
+            const newNode = {
+                id: `node_${Date.now()}_${Math.random().toString(36).substring(2, 6)}`,
+                name: name,
+                url: url,
+                status: 'idle',
+                checked: true
+            };
+
+            groups.unshift(newNode);
+            saveDatasetToLocalStorage();
+            renderGroups();
+            evaluateSelectionTrayState();
+            closeAddGroupModal();
+            logTerminalEvent(`Inserted new target layout pointer entry mapping node: [${name}]`);
+        }
+
+        function removeGroupNode(id) {
+            if (!confirm("Remove directory location point tracking entry item entirely out from storage map context?")) return;
+            groups = groups.filter(g => g.id !== id);
+            saveDatasetToLocalStorage();
+            renderGroups();
+            evaluateSelectionTrayState();
+        }
+
+        // Direct Multi-File Media Processing Subroutines
+        const imgInput = document.getElementById('imageInput');
+        const previewsWrapper = document.getElementById('imagePreviews');
+
+        imgInput.addEventListener('change', (e) => {
+            const files = Array.from(e.target.files);
+            files.forEach(file => {
+                if (!file.type.startsWith('image/')) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    const trackingId = `img_${Date.now()}_${Math.random().toString(36).substring(2,5)}`;
+                    const binaryBase64DataString = event.target.result; // Complete base64 file data string URL definition
+
+                    // Push structurally verified dataset records down into internal stack payload tracking matrices
+                    selectedImages.push({ id: trackingId, base64Data: binaryBase64DataString });
+                    
+                    const thumbnailElement = document.createElement('div');
+                    thumbnailElement.id = trackingId;
+                    thumbnailElement.className = 'relative w-20 h-20 rounded-lg overflow-hidden border border-outline-variant bg-surface shadow-sm group animate-in fade-in zoom-in-90';
+                    thumbnailElement.innerHTML = `
+                        <img src="${binaryBase64DataString}" class="w-full h-full object-cover">
+                        <button onclick="purgeAttachedImageFile('${trackingId}')" class="absolute top-1 right-1 bg-black/60 text-white rounded-full p-0.5 flex items-center justify-center hover:bg-error transition-all duration-100">
+                            <span class="material-symbols-outlined text-[12px]">close</span>
+                        </button>
+                    `;
+                    previewsWrapper.appendChild(thumbnailElement);
+                    refreshMediaCountIndicator();
+                };
+                reader.readAsDataURL(file);
+            });
+            imgInput.value = ''; // Flush state link input register clear to accommodate immediate iteration
+        });
+
+        function purgeAttachedImageFile(id) {
+            selectedImages = selectedImages.filter(item => item.id !== id);
+            const targetElement = document.getElementById(id);
+            if (targetElement) targetElement.remove();
+            refreshMediaCountIndicator();
+        }
+
+        function refreshMediaCountIndicator() {
+            const lbl = document.getElementById('mediaCountLabel');
+            lbl.textContent = selectedImages.length > 0 ? `${selectedImages.length} ASSETS STAGED READY` : "SUPPORTS PNG, JPG, WEBP";
+        }
+
+        // Text Content Template Management Core Layout Logic
+        function renderTemplates() {
+            const deck = document.getElementById('templateDeck');
+            deck.innerHTML = '';
+            
+            templates.forEach(t => {
+                const layoutString = `
+                    <div class="min-w-[280px] max-w-[280px] snap-start bg-surface-container-lowest p-5 rounded-xl border border-outline-variant/30 flex flex-col justify-between group hover:border-primary/30 transition-all cursor-pointer relative">
+                        <div>
+                            <div class="flex justify-between mb-3">
+                                <span class="text-[10px] font-bold uppercase text-outline bg-surface-container px-2 py-0.5 rounded font-mono">${t.tag}</span>
+                                <button onclick="deleteTemplateNode('${t.id}', event)" class="text-outline hover:text-error opacity-0 group-hover:opacity-100 transition-all"><span class="material-symbols-outlined text-sm" data-icon="delete">delete</span></button>
+                            </div>
+                            <p class="text-body-sm font-body-sm line-clamp-3 text-on-surface-variant font-medium">"${t.text}"</p>
+                        </div>
+                        <button class="mt-4 w-full py-2 bg-surface-container hover:bg-primary hover:text-on-primary text-primary text-label-sm font-label-sm rounded-lg transition-all" onclick="loadTemplateToComposer(this)">
+                            Copy to Composer
+                        </button>
+                    </div>
+                `;
+                deck.insertAdjacentHTML('beforeend', layoutString);
+            });
+        }
+
+        function loadTemplateToComposer(btn) {
+            const rawText = btn.previousElementSibling.querySelector('p').textContent.replace(/^"|"$/g, '');
+            document.getElementById('postText').value = rawText;
+            document.getElementById('charCounter').textContent = `${rawText.length} characters`;
+            
+            btn.textContent = 'Copied!';
+            btn.classList.replace('bg-surface-container', 'bg-emerald-500');
+            btn.classList.add('text-white');
+            setTimeout(() => {
+                btn.textContent = 'Copy to Composer';
+                btn.classList.replace('bg-emerald-500', 'bg-surface-container');
+                btn.classList.remove('text-white');
+            }, 1500);
+            logTerminalEvent("📋 Staged template context extracted down onto layout editor field workbench.");
+        }
+
+        function createNewTemplatePrompt() {
+            const txt = document.getElementById('postText').value.trim();
+            if (!txt) return alert("Composer text field context is empty. Type data properties into form first.");
+            
+            const tagInput = prompt("Enter contextual taxonomy categorization tag label parameter:", "Product Specs");
+            if (tagInput === null) return;
+            
+            const newTpl = {
+                id: `tpl_${Date.now()}`,
+                tag: tagInput.trim() || "General",
+                text: txt
+            };
+
+            templates.push(newTpl);
+            localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
+            renderTemplates();
+            logTerminalEvent(`Saved context structural array matrix snippet item inside local storage profile database template stack repository.`);
+        }
+
+        function deleteTemplateNode(id, event) {
+            event.stopPropagation();
+            if (!confirm("Purge text snippet index object permanently out from application storage parameters?")) return;
+            templates = templates.filter(t => t.id !== id);
+            localStorage.setItem('pt_templates_dataset', JSON.stringify(templates));
+            renderTemplates();
+        }
+
+        function clearComposer() {
+            document.getElementById('postText').value = '';
+            document.getElementById('charCounter').textContent = '0 characters';
+            previewsWrapper.innerHTML = '';
+            selectedImages = [];
+            refreshMediaCountIndicator();
+            logTerminalEvent("🧹 Composition desk clear complete.");
+        }
+
+        function updateProgress(val) {
+            const p = Math.min(100, Math.max(0, val));
+            document.getElementById('progressBar').style.width = `${p}%`;
+            document.getElementById('progressText').textContent = `${p}%`;
+        }
+    </script>
 </body>
 </html>
