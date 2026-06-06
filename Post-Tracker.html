@@ -626,9 +626,7 @@
 
 <script>
 // ─── CONFIG ───────────────────────────────────────────────────────────────────
-const N8N_WEBHOOK    = 'https://eskizthegoat.app.n8n.cloud/webhook/start-poster';
-const APIFY_TOKEN    = 'apify_api_6DvkGJWzeoRzGKOsByLlv7Lo961FFY3YxfvD';
-const KV_STORE_NAME  = 'facebook-cookies';
+const N8N_WEBHOOK = 'https://eskizthegoat.app.n8n.cloud/webhook/start-poster';
 
 // ─── DEFAULT GROUPS (8 groups from Link.txt) ──────────────────────────────────
 const DEFAULT_GROUPS = [
@@ -812,15 +810,16 @@ function restoreCommentImages() {
   }
 }
 
-// ─── APIFY UPLOAD ─────────────────────────────────────────────────────────────
-async function uploadImageToApify(file, key) {
-  const arrayBuffer = await file.arrayBuffer();
-  const response = await fetch(
-    `https://api.apify.com/v2/key-value-stores/${KV_STORE_NAME}/records/${key}?token=${APIFY_TOKEN}`,
-    { method: 'PUT', headers: { 'Content-Type': file.type || 'image/jpeg' }, body: arrayBuffer }
-  );
-  if (!response.ok) throw new Error(`Upload failed: ${response.status}`);
-  return `https://api.apify.com/v2/key-value-stores/${KV_STORE_NAME}/records/${key}`;
+// ─── IMAGE → BASE64 ───────────────────────────────────────────────────────────
+// Images are sent as base64 to n8n. n8n holds the Apify token and uploads them
+// server-side — the token is never exposed in this file.
+function fileToBase64(file) {
+  return new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload = (e) => resolve(e.target.result.split(',')[1]); // strip data:...;base64,
+    reader.onerror = () => reject(new Error('FileReader error'));
+    reader.readAsDataURL(file);
+  });
 }
 
 // ─── VALIDATE ─────────────────────────────────────────────────────────────────
@@ -844,43 +843,49 @@ async function startPosting() {
   document.getElementById('progressSection').style.display = '';
   hideBanner();
 
-  // Step 1 — Upload main images to Apify
-  showOverlay('กำลังอัพโหลดรูปภาพหลัก...', `0 / ${mainImageFiles.length} รูป`);
-  addLog('info', 'เริ่มอัพโหลดรูปภาพ...');
+  // Step 1 — Convert images to base64 (no Apify token needed here)
+  showOverlay('กำลังเตรียมรูปภาพ...', `0 / ${mainImageFiles.length} รูป`);
+  addLog('info', 'กำลังเตรียมรูปภาพ...');
 
-  let mainImageUrls = [];
+  let mainImagesB64 = [];
   try {
     for (let i = 0; i < mainImageFiles.length; i++) {
-      const key = `post-img-${Date.now()}-${i}`;
-      updateOverlay('กำลังอัพโหลดรูปภาพหลัก...', `${i + 1} / ${mainImageFiles.length} รูป`);
-      const url = await uploadImageToApify(mainImageFiles[i], key);
-      mainImageUrls.push(url);
-      addLog('ok', `อัพโหลดรูป ${i + 1}/${mainImageFiles.length} สำเร็จ`);
+      updateOverlay('กำลังเตรียมรูปภาพ...', `${i + 1} / ${mainImageFiles.length} รูป`);
+      const b64 = await fileToBase64(mainImageFiles[i]);
+      mainImagesB64.push({ data: b64, type: mainImageFiles[i].type || 'image/jpeg', name: mainImageFiles[i].name });
+      addLog('ok', `เตรียมรูป ${i + 1}/${mainImageFiles.length} เสร็จ`);
     }
-
-    updateOverlay('กำลังอัพโหลดรูปคอมเมนต์...', 'โปรดรอ');
-    if (comment1File) { await uploadImageToApify(comment1File, 'comment1-qr'); addLog('ok', 'อัพโหลดรูปคอมเมนต์ 1 สำเร็จ'); }
-    if (comment2File) { await uploadImageToApify(comment2File, 'comment2-qr'); addLog('ok', 'อัพโหลดรูปคอมเมนต์ 2 สำเร็จ'); }
     hideOverlay();
   } catch (err) {
     hideOverlay();
-    addLog('err', 'อัพโหลดรูปล้มเหลว: ' + err.message);
-    showToast('❌', 'อัพโหลดรูปล้มเหลว');
+    addLog('err', 'เตรียมรูปล้มเหลว: ' + err.message);
+    showToast('❌', 'เตรียมรูปล้มเหลว');
     setUIState('error'); isPosting = false; return;
   }
 
-  // Step 2 — Send to n8n
+  // Step 2 — Send everything to n8n in one payload
+  // n8n receives the images, uploads them to Apify using its stored token,
+  // then triggers the Actor. The Apify token never touches this file.
   const caption = document.getElementById('caption').value.trim();
   const payload = {
     caption,
-    mainImages: mainImageUrls,
-    comment1: { text: 'ขอเชิญเข้าโอเพนแชทเพื่อชมสินค้าเพิ่มเติมครับ', imageKey: 'comment1-qr' },
-    comment2: { text: 'สนใจติดต่อ LINE ADD ได้เลยครับ', imageKey: 'comment2-qr' },
+    mainImages: mainImagesB64,
+    comment1: {
+      text: 'ขอเชิญเข้าโอเพนแชทเพื่อชมสินค้าเพิ่มเติมครับ',
+      imageB64: comment1Base64 ? comment1Base64.split(',')[1] : null,
+      imageType: 'image/jpeg',
+    },
+    comment2: {
+      text: 'สนใจติดต่อ LINE ADD ได้เลยครับ',
+      imageB64: comment2Base64 ? comment2Base64.split(',')[1] : null,
+      imageType: 'image/jpeg',
+    },
     groups: GROUPS.map(g => ({ id: g.id, name: g.name, url: g.url })),
     totalGroups: GROUPS.length,
   };
 
-  addLog('info', 'กำลังส่งคำสั่งไปยัง n8n...');
+  addLog('info', 'กำลังส่งไปยัง n8n...');
+  showOverlay('กำลังส่งข้อมูล...', 'n8n กำลังรับคำสั่ง');
 
   let runId = null;
   try {
@@ -889,6 +894,7 @@ async function startPosting() {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(payload),
     });
+    hideOverlay();
     if (!res.ok) throw new Error(`n8n responded ${res.status}`);
     const data = await res.json();
     runId = data.runId || data.id || data.data?.id || null;
@@ -896,12 +902,13 @@ async function startPosting() {
     addLog('ok', `n8n รับคำสั่งแล้ว${runId ? ' · Run: ' + runId.slice(0, 8) : ''}`);
     showToast('🚀', 'เริ่มโพสต์แล้ว! รอ Telegram แจ้งเตือน');
   } catch (err) {
+    hideOverlay();
     addLog('err', 'n8n error: ' + err.message);
     showToast('❌', 'ไม่สามารถส่งคำสั่งได้');
     setUIState('error'); isPosting = false; return;
   }
 
-  // Step 3 — Poll Apify
+  // Step 3 — Poll status via n8n (not Apify directly)
   document.getElementById('stopBtn').style.display = '';
   if (runId) {
     startPolling(runId);
@@ -911,6 +918,7 @@ async function startPosting() {
 }
 
 // ─── POLLING ─────────────────────────────────────────────────────────────────
+// Status is checked via n8n — the Apify token stays server-side
 function startPolling(runId) {
   let pollCount = 0;
   const maxPolls = 240;
@@ -922,13 +930,12 @@ function startPolling(runId) {
       setUIState('error'); isPosting = false; return;
     }
     try {
-      const res = await fetch(`https://api.apify.com/v2/actor-runs/${runId}?token=${APIFY_TOKEN}`);
+      const res = await fetch(`https://eskizthegoat.app.n8n.cloud/webhook/run-status?runId=${runId}`);
+      if (!res.ok) return; // network hiccup, keep polling
       const data = await res.json();
-      const run = data.data;
-      if (!run) return;
-      const status = run.status;
-      const done = (run.stats || {}).doneRequestCount || 0;
-      const total = GROUPS.length;
+      const status = data.status;
+      const done   = data.done   || 0;
+      const total  = data.total  || GROUPS.length;
       updateProgress(done, total);
       if (status === 'SUCCEEDED') {
         clearInterval(pollInterval);
@@ -941,11 +948,11 @@ function startPolling(runId) {
         document.getElementById('stopBtn').style.display = 'none';
       } else if (status === 'FAILED' || status === 'ABORTED') {
         clearInterval(pollInterval);
-        addLog('err', `Apify run ${status}`);
+        addLog('err', `Run ${status}`);
         setUIState('error'); isPosting = false;
         document.getElementById('stopBtn').style.display = 'none';
       }
-    } catch(e) { /* keep polling */ }
+    } catch(e) { /* network hiccup — keep polling */ }
   }, 5000);
 }
 
@@ -953,7 +960,15 @@ function startPolling(runId) {
 async function stopPosting() {
   if (pollInterval) clearInterval(pollInterval);
   if (currentRunId) {
-    try { await fetch(`https://api.apify.com/v2/actor-runs/${currentRunId}/abort?token=${APIFY_TOKEN}`, { method: 'POST' }); } catch(e) {}
+    try {
+      // Ask n8n to abort — n8n calls Apify abort with the stored token
+      await fetch(`https://eskizthegoat.app.n8n.cloud/webhook/stop-run`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ runId: currentRunId }),
+      });
+      addLog('info', 'ส่งคำสั่งหยุดแล้ว');
+    } catch(e) {}
   }
   isPosting = false;
   setUIState('idle');
