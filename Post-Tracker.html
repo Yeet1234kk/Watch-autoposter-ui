@@ -309,6 +309,14 @@
     flex-shrink: 0; transition: all 0.15s;
   }
   .group-remove:active { background: var(--red-bg); color: var(--red); border-color: rgba(192,57,43,0.3); }
+  .group-link-btn {
+    width: 26px; height: 26px; border-radius: 7px;
+    background: var(--blue-bg); border: 1px solid rgba(26,74,138,0.18);
+    color: var(--blue); font-size: 13px; font-weight: 600; font-family: var(--mono);
+    display: flex; align-items: center; justify-content: center;
+    flex-shrink: 0; text-decoration: none; transition: all 0.15s;
+  }
+  .group-link-btn:active { opacity: 0.6; }
 
   /* ── ADD GROUP MODAL ── */
   .modal-backdrop {
@@ -687,6 +695,7 @@ function renderGroups() {
         <div class="group-url">${g.url}</div>
       </div>
       <span class="group-status-icon" id="gicon-${g.id}">⬜</span>
+      <a class="group-link-btn" href="${g.url}" target="_blank" rel="noopener" title="เปิดกลุ่ม">↗</a>
       <button class="group-remove" onclick="removeGroup('${g.id}')" ${isPosting ? 'disabled' : ''}>×</button>
     </div>
   `).join('');
